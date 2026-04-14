@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Invoices | EduPulse{% endblock %}
+{% block page_heading %}Fee Invoices{% endblock %}
+{% block content %}
+<div class="dual">
+    <div class="card">
+        <h3>Create Invoice</h3>
+        <form method="post">{% csrf_token %}{{ form.as_p }}<button class="btn" type="submit">Save</button></form>
+    </div>
+    <div class="card">
+        <h3>Invoice List</h3>
+        <div class="table-wrap"><table><thead><tr><th>Student</th><th>Structure</th><th>Due</th><th>Paid</th><th>Status</th></tr></thead><tbody>{% for i in invoices %}<tr><td>{{ i.student.user.get_full_name }}</td><td>{{ i.fee_structure }}</td><td>{{ i.amount_due }}</td><td>{{ i.amount_paid }}</td><td>{{ i.status }}</td></tr>{% empty %}<tr><td colspan="5">No invoices yet.</td></tr>{% endfor %}</tbody></table></div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Payments | EduPulse{% endblock %}
+{% block page_heading %}Payments{% endblock %}
+{% block content %}
+<div class="dual">
+    <div class="card">
+        <h3>Record Payment</h3>
+        <form method="post">{% csrf_token %}{{ form.as_p }}<button class="btn" type="submit">Save</button></form>
+    </div>
+    <div class="card">
+        <h3>Payment History</h3>
+        <div class="table-wrap"><table><thead><tr><th>Invoice</th><th>Amount</th><th>Method</th><th>Date</th></tr></thead><tbody>{% for p in payments %}<tr><td>{{ p.invoice }}</td><td>{{ p.amount }}</td><td>{{ p.method }}</td><td>{{ p.payment_date }}</td></tr>{% empty %}<tr><td colspan="4">No payments yet.</td></tr>{% endfor %}</tbody></table></div>
+    </div>
+</div>
+{% endblock %}

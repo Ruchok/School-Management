@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Fee Structures | EduPulse{% endblock %}
+{% block page_heading %}Fee Structures{% endblock %}
+{% block content %}
+<div class="dual">
+    <div class="card">
+        <h3>Add Fee Structure</h3>
+        <form method="post">{% csrf_token %}{{ form.as_p }}<button class="btn" type="submit">Save</button></form>
+    </div>
+    <div class="card">
+        <h3>Structures</h3>
+        <div class="table-wrap"><table><thead><tr><th>Title</th><th>Class</th><th>Amount</th><th>Due</th></tr></thead><tbody>{% for f in structures %}<tr><td>{{ f.title }}</td><td>{{ f.classroom }}</td><td>{{ f.amount }}</td><td>{{ f.due_date }}</td></tr>{% empty %}<tr><td colspan="4">No fee structures yet.</td></tr>{% endfor %}</tbody></table></div>
+    </div>
+</div>
+{% endblock %}

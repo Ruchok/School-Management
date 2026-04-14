@@ -1,0 +1,60 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}School Management{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+<div class="bg-shape bg-shape-a"></div>
+<div class="bg-shape bg-shape-b"></div>
+<div class="layout">
+    {% if user.is_authenticated %}
+    <aside class="sidebar">
+        <h1>EduPulse</h1>
+        <p class="subtitle">School Management</p>
+        <nav>
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <a href="{% url 'academics:classes' %}">Classes</a>
+            <a href="{% url 'academics:subjects' %}">Subjects</a>
+            <a href="{% url 'academics:students' %}">Students</a>
+            <a href="{% url 'attendance:list' %}">Attendance</a>
+            <a href="{% url 'exams:list' %}">Exams</a>
+            <a href="{% url 'exams:results' %}">Results</a>
+            <a href="{% url 'finance:structures' %}">Fee Structures</a>
+            <a href="{% url 'finance:invoices' %}">Invoices</a>
+            <a href="{% url 'finance:payments' %}">Payments</a>
+            <a href="{% url 'admin:index' %}">Admin</a>
+        </nav>
+    </aside>
+    {% endif %}
+    <main class="content {% if not user.is_authenticated %}content-auth{% endif %}">
+        {% if user.is_authenticated %}
+        <header class="topbar">
+            <div>
+                <h2>{% block page_heading %}Overview{% endblock %}</h2>
+                <p>Welcome, {{ user.get_full_name|default:user.username }}</p>
+            </div>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline">Logout</button>
+            </form>
+        </header>
+        {% endif %}
+
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+</div>
+</body>
+</html>

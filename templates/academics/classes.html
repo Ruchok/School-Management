@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Classes | EduPulse{% endblock %}
+{% block page_heading %}Classes{% endblock %}
+{% block content %}
+<div class="dual">
+    <div class="card">
+        <h3>Add Class</h3>
+        <form method="post">{% csrf_token %}{{ form.as_p }}<button class="btn" type="submit">Save</button></form>
+    </div>
+    <div class="card">
+        <h3>Class List</h3>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Name</th><th>Section</th><th>Teacher</th></tr></thead>
+                <tbody>{% for c in classes %}<tr><td>{{ c.name }}</td><td>{{ c.section }}</td><td>{{ c.class_teacher }}</td></tr>{% empty %}<tr><td colspan="3">No classes yet.</td></tr>{% endfor %}</tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

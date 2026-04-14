@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard | EduPulse{% endblock %}
+{% block page_heading %}Dashboard{% endblock %}
+{% block content %}
+<div class="grid">
+    <div class="card"><h3>Total Students</h3><div class="metric">{{ stats.students }}</div></div>
+    <div class="card"><h3>Total Classes</h3><div class="metric">{{ stats.classes }}</div></div>
+    <div class="card"><h3>Subjects</h3><div class="metric">{{ stats.subjects }}</div></div>
+    <div class="card"><h3>Exams</h3><div class="metric">{{ stats.exams }}</div></div>
+    <div class="card"><h3>Results</h3><div class="metric">{{ stats.results }}</div></div>
+    <div class="card"><h3>Invoices</h3><div class="metric">{{ stats.invoices }}</div></div>
+</div>
+
+<div class="dual" style="margin-top:14px;">
+    <div class="card">
+        <h3>Attendance Mix</h3>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Status</th><th>Total</th></tr></thead>
+                <tbody>
+                {% for row in attendance_breakdown %}
+                    <tr><td>{{ row.status }}</td><td>{{ row.total }}</td></tr>
+                {% empty %}
+                    <tr><td colspan="2">No attendance records yet.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card">
+        <h3>Recent Students</h3>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Roll</th><th>Name</th><th>Class</th></tr></thead>
+                <tbody>
+                {% for s in recent_students %}
+                    <tr><td>{{ s.roll_number }}</td><td>{{ s.user.get_full_name }}</td><td>{{ s.classroom }}</td></tr>
+                {% empty %}
+                    <tr><td colspan="3">No students yet.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

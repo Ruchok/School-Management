@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Results | EduPulse{% endblock %}
+{% block page_heading %}Results{% endblock %}
+{% block content %}
+<div class="dual">
+    <div class="card">
+        <h3>Enter Result</h3>
+        <form method="post">{% csrf_token %}{{ form.as_p }}<button class="btn" type="submit">Save</button></form>
+    </div>
+    <div class="card">
+        <h3>Result List</h3>
+        <div class="table-wrap"><table><thead><tr><th>Exam</th><th>Student</th><th>Marks</th><th>Grade</th></tr></thead><tbody>{% for r in results %}<tr><td>{{ r.exam }}</td><td>{{ r.student.user.get_full_name }}</td><td>{{ r.marks }}</td><td>{{ r.grade }}</td></tr>{% empty %}<tr><td colspan="4">No results yet.</td></tr>{% endfor %}</tbody></table></div>
+    </div>
+</div>
+{% endblock %}
