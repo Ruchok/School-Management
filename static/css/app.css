@@ -19,6 +19,12 @@ body {
     color: var(--ink);
 }
 
+body.auth-wallpaper {
+    background:
+        linear-gradient(130deg, rgba(9, 23, 18, 0.76), rgba(9, 23, 18, 0.35)),
+    url("../img/66909928_2467811603280126_820030671236890624_n.jpeg") center/cover no-repeat fixed;
+}
+
 .bg-shape {
     position: fixed;
     z-index: -1;
@@ -46,6 +52,10 @@ body {
     min-height: 100vh;
     display: grid;
     grid-template-columns: 260px 1fr;
+}
+
+.layout.layout-auth {
+    grid-template-columns: 1fr;
 }
 
 .sidebar {
@@ -92,8 +102,95 @@ body {
 }
 
 .content-auth {
-    max-width: 480px;
-    margin: 80px auto;
+    max-width: none;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 20px;
+}
+
+.auth-center {
+    width: min(560px, 100%);
+    text-align: center;
+}
+
+.school-hero {
+    margin: 0 auto 8px;
+    width: min(500px, 100%);
+    padding: 10px 14px;
+    border-radius: 18px;
+    border: 1px solid rgba(235, 255, 248, 0.45);
+    background: linear-gradient(140deg, rgba(8, 35, 26, 0.48), rgba(8, 35, 26, 0.24));
+    backdrop-filter: blur(4px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: #f4fff9;
+    text-shadow: 0 8px 24px rgba(5, 12, 10, 0.45);
+    animation: rise 0.45s ease;
+}
+
+.school-hero .school-tag {
+    margin: 0;
+    letter-spacing: 0.14em;
+    font-size: 12px;
+    text-transform: uppercase;
+    opacity: 0.9;
+}
+
+.school-hero h1 {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 18px;
+    box-sizing: border-box;
+    margin: 6px 0 0;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 21px;
+    line-height: 1.28;
+}
+
+body.auth-wallpaper .content-auth .card {
+    border: 1px solid rgba(226, 255, 244, 0.45);
+    background: rgba(255, 255, 255, 0.32);
+    backdrop-filter: blur(8px);
+    text-align: left;
+}
+
+body.auth-wallpaper .content-auth .card h2 {
+    margin-bottom: 6px;
+    text-align: center;
+}
+
+body.auth-wallpaper .content-auth .card .subtitle {
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: #e8fff6;
+    text-align: center;
+}
+
+body.auth-wallpaper .content-auth .card form {
+    gap: 4px;
+}
+
+.content-auth .card form p {
+    margin: 0;
+}
+
+body.auth-wallpaper .content-auth .card label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 600;
+    text-align: left;
+    color: #e7fff4;
+}
+
+body.auth-wallpaper .content-auth .card input {
+    background: rgba(255, 255, 255, 0.78);
+    border: 1px solid rgba(221, 255, 243, 0.8);
 }
 
 .topbar {
@@ -210,4 +307,7 @@ input, select, textarea {
         position: relative;
     }
     .dual { grid-template-columns: 1fr; }
+    .school-hero h1 {
+        font-size: 18px;
+    }
 }
