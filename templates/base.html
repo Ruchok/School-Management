@@ -8,7 +8,22 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <!-- AG Grid CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.3.0/dist/styles/ag-grid.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.3.0/dist/styles/ag-theme-quartz.css">
     <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    <style>
+        .ag-theme-quartz {
+            --ag-grid-size: 4px;
+            --ag-list-item-height: 32px;
+            --ag-header-height: 36px;
+            --ag-header-background-color: #edf6f2;
+            --ag-background-color: #ffffff;
+            --ag-foreground-color: #10251a;
+            --ag-border-color: #d9e5db;
+        }
+        .ag-grid-wrapper { margin: 20px 0; }
+    </style>
 </head>
 <body class="{% if not user.is_authenticated %}auth-wallpaper{% endif %}">
 <div class="bg-shape bg-shape-a"></div>
@@ -56,5 +71,8 @@
         {% block content %}{% endblock %}
     </main>
 </div>
+<!-- AG Grid Library -->
+<script src="https://cdn.jsdelivr.net/npm/ag-grid-community@31.3.0/dist/ag-grid-community.min.js"></script>
+{% block extra_scripts %}{% endblock %}
 </body>
 </html>

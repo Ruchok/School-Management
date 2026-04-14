@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Attendance - School Management{% endblock %}
+{% block page_heading %}Attendance Grid{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="margin-bottom: 20px;">
+        <h2>Attendance Records</h2>
+        <p>View student attendance history</p>
+    </div>
+    
+    <div id="attendanceGrid" class="ag-theme-quartz ag-grid-wrapper" style="height: 500px;"></div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const columnDefs = [
+        { headerName: "ID", field: "id", width: 80 },
+        { headerName: "Student", field: "student", width: 150 },
+        { headerName: "Class", field: "class", width: 120 },
+        { headerName: "Date", field: "date", width: 120 },
+        { headerName: "Status", field: "status", width: 100 }
+    ];
+
+    const gridOptions = {
+        columnDefs: columnDefs,
+        rowData: [],
+        pagination: true,
+        paginationPageSize: 20,
+        defaultColDef: {
+            sortable: true,
+            filter: true,
+            resizable: true
+        }
+    };
+
+    const gridDiv = document.querySelector('#attendanceGrid');
+    new agGrid.Grid(gridDiv, gridOptions);
+
+    fetch('{% url "academics:attendance_api" %}')
+        .then(response => response.json())
+        .then(json => {
+            gridOptions.api.setGridOption('rowData', json.data);
+        })
+        .catch(error => console.error('Error fetching attendance:', error));
+</script>
+{% endblock %}

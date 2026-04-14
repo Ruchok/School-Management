@@ -8,6 +8,14 @@ https://docs.djangoproject.com/en/6.0/howto/deployment/wsgi/
 """
 
 import os
+import sys
+
+# Register PyMySQL as MySQLdb before importing Django
+try:
+    import pymysql
+    pymysql.install_as_MySQLdb()
+except Exception:
+    pass
 
 from django.core.wsgi import get_wsgi_application
 

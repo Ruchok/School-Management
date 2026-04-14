@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Subjects - School Management{% endblock %}
+{% block page_heading %}Subjects Grid{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="margin-bottom: 20px;">
+        <h2>Subjects List</h2>
+        <p>View and manage all subjects</p>
+    </div>
+    
+    <div id="subjectsGrid" class="ag-theme-quartz ag-grid-wrapper" style="height: 500px;"></div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const columnDefs = [
+        { headerName: "ID", field: "id", width: 80 },
+        { headerName: "Subject Name", field: "name", width: 200 },
+        { headerName: "Subject Code", field: "code", width: 120 }
+    ];
+
+    const gridOptions = {
+        columnDefs: columnDefs,
+        rowData: [],
+        pagination: true,
+        paginationPageSize: 20,
+        defaultColDef: {
+            sortable: true,
+            filter: true,
+            resizable: true
+        }
+    };
+
+    const gridDiv = document.querySelector('#subjectsGrid');
+    new agGrid.Grid(gridDiv, gridOptions);
+
+    fetch('{% url "academics:subjects_api" %}')
+        .then(response => response.json())
+        .then(json => {
+            gridOptions.api.setGridOption('rowData', json.data);
+        })
+        .catch(error => console.error('Error fetching subjects:', error));
+</script>
+{% endblock %}

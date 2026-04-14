@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Students - School Management{% endblock %}
+{% block page_heading %}Students Grid{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="margin-bottom: 20px;">
+        <h2>Students List</h2>
+        <p>Manage and view all students in the system</p>
+    </div>
+    
+    <div id="studentsGrid" class="ag-theme-quartz ag-grid-wrapper" style="height: 600px;"></div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // AG Grid Column Definitions
+    const columnDefs = [
+        { headerName: "ID", field: "id", width: 80 },
+        { headerName: "Name", field: "name", width: 150 },
+        { headerName: "Username", field: "username", width: 120 },
+        { headerName: "Email", field: "email", width: 200 },
+        { headerName: "Class", field: "class", width: 100 },
+        { headerName: "Roll Number", field: "roll", width: 100 },
+        { headerName: "Joined Date", field: "joinedDate", width: 130 }
+    ];
+
+    // Grid Options
+    const gridOptions = {
+        columnDefs: columnDefs,
+        rowData: [],
+        pagination: true,
+        paginationPageSize: 20,
+        defaultColDef: {
+            sortable: true,
+            filter: true,
+            resizable: true,
+            flex: 1
+        },
+        theme: {
+            simple: ['compact']
+        }
+    };
+
+    // Create Grid
+    const gridDiv = document.querySelector('#studentsGrid');
+    new agGrid.Grid(gridDiv, gridOptions);
+
+    // Fetch data from API
+    fetch('{% url "academics:students_api" %}')
+        .then(response => response.json())
+        .then(json => {
+            gridOptions.api.setGridOption('rowData', json.data);
+        })
+        .catch(error => console.error('Error fetching students:', error));
+</script>
+{% endblock %}

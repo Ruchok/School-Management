@@ -3,6 +3,13 @@
 import os
 import sys
 
+# Register PyMySQL as MySQLdb before importing Django
+try:
+    import pymysql
+    pymysql.install_as_MySQLdb()
+except Exception:
+    pass
+
 
 def main():
     """Run administrative tasks."""

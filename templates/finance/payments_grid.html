@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Payments - School Management{% endblock %}
+{% block page_heading %}Payments Grid{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="margin-bottom: 20px;">
+        <h2>Payment Records</h2>
+        <p>View all student payments</p>
+    </div>
+    
+    <div id="paymentsGrid" class="ag-theme-quartz ag-grid-wrapper" style="height: 500px;"></div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const columnDefs = [
+        { headerName: "ID", field: "id", width: 80 },
+        { headerName: "Student", field: "student", width: 150 },
+        { headerName: "Amount", field: "amount", width: 120 },
+        { headerName: "Date", field: "date", width: 120 },
+        { headerName: "Method", field: "method", width: 120 }
+    ];
+
+    const gridOptions = {
+        columnDefs: columnDefs,
+        rowData: [],
+        pagination: true,
+        paginationPageSize: 20,
+        defaultColDef: {
+            sortable: true,
+            filter: true,
+            resizable: true
+        }
+    };
+
+    const gridDiv = document.querySelector('#paymentsGrid');
+    new agGrid.Grid(gridDiv, gridOptions);
+
+    fetch('{% url "academics:payments_api" %}')
+        .then(response => response.json())
+        .then(json => {
+            gridOptions.api.setGridOption('rowData', json.data);
+        })
+        .catch(error => console.error('Error fetching payments:', error));
+</script>
+{% endblock %}

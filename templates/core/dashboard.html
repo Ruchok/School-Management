@@ -2,6 +2,19 @@
 {% block title %}Dashboard | EduPulse{% endblock %}
 {% block page_heading %}Dashboard{% endblock %}
 {% block content %}
+<!-- Grid Views Shortcuts -->
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; padding: 20px; margin-bottom: 20px; color: white;">
+    <h3 style="margin-top: 0; color: white;">Quick Access - Data Grids</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;">
+        <a href="{% url 'academics:students_grid' %}" style="padding: 12px; background: rgba(255,255,255,0.2); border-radius: 6px; text-decoration: none; color: white; text-align: center; transition: all 0.3s;">📚 Students Grid</a>
+        <a href="{% url 'academics:classes_grid' %}" style="padding: 12px; background: rgba(255,255,255,0.2); border-radius: 6px; text-decoration: none; color: white; text-align: center; transition: all 0.3s;">🏫 Classes Grid</a>
+        <a href="{% url 'academics:subjects_grid' %}" style="padding: 12px; background: rgba(255,255,255,0.2); border-radius: 6px; text-decoration: none; color: white; text-align: center; transition: all 0.3s;">📖 Subjects Grid</a>
+        <a href="{% url 'academics:attendance_grid' %}" style="padding: 12px; background: rgba(255,255,255,0.2); border-radius: 6px; text-decoration: none; color: white; text-align: center; transition: all 0.3s;">✓ Attendance Grid</a>
+        <a href="{% url 'academics:exams_grid' %}" style="padding: 12px; background: rgba(255,255,255,0.2); border-radius: 6px; text-decoration: none; color: white; text-align: center; transition: all 0.3s;">📝 Exams Grid</a>
+        <a href="{% url 'academics:payments_grid' %}" style="padding: 12px; background: rgba(255,255,255,0.2); border-radius: 6px; text-decoration: none; color: white; text-align: center; transition: all 0.3s;">💰 Payments Grid</a>
+    </div>
+</div>
+
 <div class="grid">
     <div class="card"><h3>Total Students</h3><div class="metric">{{ stats.students }}</div></div>
     <div class="card"><h3>Total Classes</h3><div class="metric">{{ stats.classes }}</div></div>
