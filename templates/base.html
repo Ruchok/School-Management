@@ -10,10 +10,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/app.css' %}">
 </head>
-<body>
+<body class="{% if not user.is_authenticated %}auth-wallpaper{% endif %}">
 <div class="bg-shape bg-shape-a"></div>
 <div class="bg-shape bg-shape-b"></div>
-<div class="layout">
+<div class="layout {% if not user.is_authenticated %}layout-auth{% endif %}">
     {% if user.is_authenticated %}
     <aside class="sidebar">
         <h1>EduPulse</h1>

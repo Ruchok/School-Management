@@ -136,9 +136,10 @@ body.auth-wallpaper {
 .school-hero .school-tag {
     margin: 0;
     letter-spacing: 0.14em;
-    font-size: 12px;
+    font-size: 16px;
     text-transform: uppercase;
-    opacity: 0.9;
+    font-weight: 700;
+    opacity: 0.95;
 }
 
 .school-hero h1 {
@@ -149,8 +150,8 @@ body.auth-wallpaper {
     box-sizing: border-box;
     margin: 6px 0 0;
     font-family: "Space Grotesk", sans-serif;
-    font-size: 21px;
-    line-height: 1.28;
+    font-size: 28px;
+    line-height: 1.2;
 }
 
 body.auth-wallpaper .content-auth .card {
@@ -308,6 +309,6 @@ input, select, textarea {
     }
     .dual { grid-template-columns: 1fr; }
     .school-hero h1 {
-        font-size: 18px;
+        font-size: 20px;
     }
 }
