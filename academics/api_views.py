@@ -28,6 +28,28 @@ def students_data_api(request):
     return JsonResponse({'data': data})
 
 @require_http_methods(["GET"])
+def teachers_data_api(request):
+    """Return teachers data as JSON for AG Grid"""
+    teachers = TeacherProfile.objects.select_related('user').values(
+        'id', 'user__username', 'user__first_name', 'user__last_name',
+        'user__email', 'qualification', 'subject_expertise', 'experience_years'
+    )
+    
+    data = [
+        {
+            'id': t['id'],
+            'name': f"{t['user__first_name']} {t['user__last_name']}".strip(),
+            'username': t['user__username'],
+            'email': t['user__email'],
+            'qualification': t['qualification'],
+            'expertise': t['subject_expertise'],
+            'experience': t['experience_years']
+        }
+        for t in teachers
+    ]
+    return JsonResponse({'data': data})
+
+@require_http_methods(["GET"])
 def classes_data_api(request):
     """Return classes data as JSON for AG Grid"""
     classes = SchoolClass.objects.values('id', 'name', 'section')

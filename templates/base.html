@@ -31,13 +31,14 @@
 <div class="layout {% if not user.is_authenticated %}layout-auth{% endif %}">
     {% if user.is_authenticated %}
     <aside class="sidebar">
-        <h1>EduPulse</h1>
+        <h1>JJKM GVT SCHOOL AND COLLEGE</h1>
         <p class="subtitle">School Management</p>
         <nav>
             <a href="{% url 'dashboard' %}">Dashboard</a>
             <a href="{% url 'academics:classes' %}">Classes</a>
             <a href="{% url 'academics:subjects' %}">Subjects</a>
             <a href="{% url 'academics:students' %}">Students</a>
+            <a href="{% url 'academics:teachers' %}">Teachers</a>
             <a href="{% url 'attendance:list' %}">Attendance</a>
             <a href="{% url 'exams:list' %}">Exams</a>
             <a href="{% url 'exams:results' %}">Results</a>

@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Teachers Grid - School Management System{% endblock %}
+
+{% block content %}
+<div class="grid-container">
+    <div class="grid-header">
+        <h1>👨‍🏫 Teachers Grid</h1>
+        <div class="header-actions">
+            <a href="{% url 'academics:teachers' %}" class="btn btn-secondary">← Back to Teachers</a>
+        </div>
+    </div>
+
+    <div id="teachers-grid" class="ag-theme-quartz" style="height: 600px;"></div>
+</div>
+
+<style>
+    .grid-container {
+        padding: 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .grid-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e8eef2;
+    }
+
+    .grid-header h1 {
+        font-size: 28px;
+        color: #2c3e50;
+        margin: 0;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+
+    .btn-secondary {
+        background-color: #95a5a6;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background-color: #7f8c8d;
+        transform: translateY(-2px);
+    }
+
+    .ag-theme-quartz {
+        margin-top: 20px;
+        border-radius: 8px;
+        border: 1px solid #dde6f1;
+    }
+
+    @media (max-width: 768px) {
+        .grid-container {
+            padding: 15px;
+        }
+
+        #teachers-grid {
+            height: 400px;
+        }
+
+        .grid-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/ag-grid-community@31.3.0/dist/ag-grid-community.min.js"></script>
+<script>
+    // Create teachers grid
+    const gridDiv = document.getElementById('teachers-grid');
+    const gridOptions = {
+        columnDefs: [
+            { field: 'id', headerName: 'ID', width: 80, sortable: true, filter: true },
+            { field: 'name', headerName: 'Name', width: 200, sortable: true, filter: true },
+            { field: 'username', headerName: 'Username', width: 150, sortable: true, filter: true },
+            { field: 'email', headerName: 'Email', width: 200, sortable: true, filter: true },
+            { field: 'qualification', headerName: 'Qualification', width: 150, sortable: true, filter: true },
+            { field: 'expertise', headerName: 'Subject Expertise', width: 180, sortable: true, filter: true },
+            { field: 'experience', headerName: 'Experience (years)', width: 150, sortable: true, filter: true }
+        ],
+        pagination: true,
+        paginationPageSize: 20,
+        rowData: [],
+        domLayout: 'autoHeight',
+        defaultColDef: {
+            resizable: true,
+            sortable: true,
+            filter: true
+        }
+    };
+
+    const gridApi = agGrid.createGrid(gridDiv, gridOptions);
+
+    // Fetch teacher data from API
+    fetch('/academics/api/teachers/')
+        .then(response => response.json())
+        .then(data => {
+            gridApi.applyTransaction({ add: data.data });
+        })
+        .catch(error => console.error('Error loading teachers:', error));
+</script>
+{% endblock %}

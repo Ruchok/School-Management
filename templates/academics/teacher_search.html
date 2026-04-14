@@ -1,0 +1,414 @@
+{% extends "base.html" %}
+
+{% block title %}Search Teachers - School Management System{% endblock %}
+
+{% block content %}
+<div class="search-container">
+    <div class="search-header">
+        <h1>🔍 Search Teachers</h1>
+        <p class="subtitle">Find teachers by name, email, qualification, or subject expertise</p>
+    </div>
+
+    <div class="search-section">
+        <form method="get" class="search-form">
+            <div class="search-input-wrapper">
+                <input 
+                    type="text" 
+                    name="q" 
+                    class="search-input" 
+                    placeholder="🔍 Search by name, email, qualification, or expertise..."
+                    value="{{ query }}"
+                />
+                <button type="submit" class="search-btn">Search</button>
+            </div>
+        </form>
+
+        {% if query %}
+            <div class="search-stats">
+                {% if count > 0 %}
+                    <p>Found <strong>{{ count }}</strong> teacher{{ count|pluralize }}.</p>
+                {% else %}
+                    <p>No results found for "<strong>{{ query }}</strong>".</p>
+                {% endif %}
+            </div>
+
+            {% if results %}
+                <div class="results-container">
+                    {% for teacher in results %}
+                        <div class="teacher-result-card">
+                            <div class="teacher-header">
+                                <div class="teacher-avatar">{{ teacher.user.first_name|first|upper }}</div>
+                                <div class="teacher-details">
+                                    <h3 class="teacher-name">{{ teacher.user.get_full_name|default:teacher.user.username }}</h3>
+                                    <p class="teacher-role">Teacher</p>
+                                </div>
+                            </div>
+
+                            <div class="teacher-info">
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <label>Email:</label>
+                                        <span>{{ teacher.user.email }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Qualification:</label>
+                                        <span class="badge-qualification">{{ teacher.qualification|default:"N/A" }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Subject Expertise:</label>
+                                        <span class="expertise-text">{{ teacher.subject_expertise|default:"Not specified" }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Experience:</label>
+                                        <span class="experience-years">{{ teacher.experience_years|default:"0" }} years</span>
+                                    </div>
+                                    {% if teacher.phone_number %}
+                                        <div class="info-item">
+                                            <label>Phone:</label>
+                                            <span>{{ teacher.phone_number }}</span>
+                                        </div>
+                                    {% endif %}
+                                    {% if teacher.address %}
+                                        <div class="info-item">
+                                            <label>Address:</label>
+                                            <span>{{ teacher.address }}</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="result-footer">
+                                <a href="{% url 'academics:teachers' %}" class="link-btn">View All Teachers →</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-results">
+                    <div class="empty-icon">😕</div>
+                    <h3>No Results Found</h3>
+                    <p>We couldn't find any teachers matching "<strong>{{ query }}</strong>". Try a different search term.</p>
+                    <a href="{% url 'academics:teachers_search' %}" class="btn btn-reset">Clear Search</a>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="search-prompt">
+                <div class="prompt-icon">👨‍🏫</div>
+                <h2>Start Searching</h2>
+                <p>Enter a teacher's name, email, qualification, or subject expertise to find their information.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .search-container {
+        padding: 40px 20px;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .search-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .search-header h1 {
+        font-size: 36px;
+        color: #2c3e50;
+        margin-bottom: 10px;
+    }
+
+    .search-header .subtitle {
+        font-size: 16px;
+        color: #7f8c8d;
+        margin: 0;
+    }
+
+    .search-section {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .search-form {
+        width: 100%;
+    }
+
+    .search-input-wrapper {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+    }
+
+    .search-input {
+        padding: 14px 20px;
+        border: 2px solid #dde6f1;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        font-family: inherit;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    .search-btn {
+        padding: 14px 32px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .search-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+    }
+
+    .search-stats {
+        margin-top: 20px;
+        padding: 12px 16px;
+        background-color: #f0e8f8;
+        border-left: 4px solid #764ba2;
+        border-radius: 4px;
+        color: #6c3483;
+        font-weight: 500;
+    }
+
+    .results-container {
+        margin-top: 30px;
+        display: grid;
+        gap: 20px;
+    }
+
+    .teacher-result-card {
+        background: white;
+        border: 1px solid #e8eef2;
+        border-radius: 10px;
+        padding: 24px;
+        transition: all 0.3s ease;
+    }
+
+    .teacher-result-card:hover {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        border-color: #667eea;
+    }
+
+    .teacher-header {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 20px;
+        align-items: center;
+    }
+
+    .teacher-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+
+    .teacher-name {
+        font-size: 20px;
+        color: #2c3e50;
+        margin: 0 0 4px 0;
+        font-weight: 600;
+    }
+
+    .teacher-role {
+        font-size: 13px;
+        color: #7f8c8d;
+        margin: 0;
+    }
+
+    .teacher-info {
+        margin-bottom: 16px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 16px;
+    }
+
+    .info-item {
+        padding: 12px;
+        background-color: #f8f9fc;
+        border-radius: 6px;
+    }
+
+    .info-item label {
+        display: block;
+        font-weight: 600;
+        color: #7f8c8d;
+        font-size: 12px;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+    }
+
+    .info-item span {
+        color: #2c3e50;
+        font-size: 14px;
+    }
+
+    .badge-qualification {
+        display: inline-block;
+        background-color: #e8f4f8;
+        color: #0066cc;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .expertise-text {
+        display: block;
+        color: #2c3e50;
+        font-size: 14px;
+    }
+
+    .experience-years {
+        display: inline-block;
+        background-color: #f0e8f8;
+        color: #6c3483;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .result-footer {
+        text-align: right;
+        padding-top: 12px;
+        border-top: 1px solid #e8eef2;
+    }
+
+    .link-btn {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 13px;
+        transition: all 0.3s ease;
+    }
+
+    .link-btn:hover {
+        color: #764ba2;
+    }
+
+    .search-prompt {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .prompt-icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+    }
+
+    .search-prompt h2 {
+        font-size: 24px;
+        color: #2c3e50;
+        margin: 0 0 10px 0;
+    }
+
+    .search-prompt p {
+        color: #7f8c8d;
+        font-size: 16px;
+        margin: 0;
+    }
+
+    .empty-results {
+        text-align: center;
+        padding: 60px 20px;
+        background: #f8f9fc;
+        border-radius: 10px;
+        border: 2px dashed #dde6f1;
+        margin-top: 30px;
+    }
+
+    .empty-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+    }
+
+    .empty-results h3 {
+        font-size: 22px;
+        color: #2c3e50;
+        margin: 0 0 8px 0;
+    }
+
+    .empty-results p {
+        color: #7f8c8d;
+        margin: 0 0 24px 0;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-reset {
+        padding: 10px 24px;
+        margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+        .search-container {
+            padding: 20px 15px;
+        }
+
+        .search-header h1 {
+            font-size: 28px;
+        }
+
+        .search-input-wrapper {
+            grid-template-columns: 1fr;
+        }
+
+        .search-btn {
+            width: 100%;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .teacher-result-card {
+            padding: 16px;
+        }
+
+        .result-footer {
+            text-align: left;
+        }
+    }
+</style>
+{% endblock %}

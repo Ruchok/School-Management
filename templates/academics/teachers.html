@@ -1,0 +1,369 @@
+{% extends "base.html" %}
+
+{% block title %}Teachers - School Management System{% endblock %}
+
+{% block content %}
+<div class="academics-container">
+    <div class="page-header">
+        <h1>👨‍🏫 Teachers</h1>
+        <p class="subtitle">Manage teacher information and details</p>
+    </div>
+
+    <main class="main-content">
+        <!-- Teachers List Section -->
+        <section class="teachers-list-section">
+            <div class="section-header">
+                <h2>Teacher Directory</h2>
+                <div class="view-options">
+                    <a href="{% url 'academics:teachers_grid' %}" class="btn btn-style grid-view-btn">
+                        📊 Grid View
+                    </a>
+                </div>
+            </div>
+
+            {% if teachers %}
+                <div class="teachers-grid">
+                    {% for teacher in teachers %}
+                        <div class="teacher-card">
+                            <div class="card-header">
+                                <div class="teacher-avatar">
+                                    <span class="avatar-initial">{{ teacher.user.first_name|first|upper }}</span>
+                                </div>
+                                <div class="teacher-info-header">
+                                    <h3 class="teacher-name">{{ teacher.user.get_full_name|default:teacher.user.username }}</h3>
+                                    <p class="teacher-id">ID: {{ teacher.id }}</p>
+                                </div>
+                            </div>
+
+                            <div class="card-content">
+                                <div class="info-row">
+                                    <label>Email:</label>
+                                    <span>{{ teacher.user.email }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <label>Username:</label>
+                                    <span>{{ teacher.user.username }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <label>Qualification:</label>
+                                    <span class="badge qualification-badge">{{ teacher.qualification|default:"N/A" }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <label>Subject Expertise:</label>
+                                    <span>{{ teacher.subject_expertise|default:"Not specified" }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <label>Experience:</label>
+                                    <span class="experience-badge">{{ teacher.experience_years|default:"0" }} years</span>
+                                </div>
+                                {% if teacher.phone_number %}
+                                    <div class="info-row">
+                                        <label>Phone:</label>
+                                        <span>{{ teacher.phone_number }}</span>
+                                    </div>
+                                {% endif %}
+                                {% if teacher.address %}
+                                    <div class="info-row">
+                                        <label>Address:</label>
+                                        <span>{{ teacher.address }}</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="card-footer">
+                                <a href="#" class="btn btn-small btn-edit">✏️ Edit</a>
+                                <a href="#" class="btn btn-small btn-delete">🗑️ Delete</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">👨‍🏫</div>
+                    <h3>No Teachers Found</h3>
+                    <p>There are currently no teachers in the system. Add a teacher to get started.</p>
+                </div>
+            {% endif %}
+        </section>
+    </main>
+</div>
+
+<style>
+    .academics-container {
+        padding: 40px 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .page-header h1 {
+        font-size: 36px;
+        color: #2c3e50;
+        margin-bottom: 10px;
+    }
+
+    .page-header .subtitle {
+        font-size: 16px;
+        color: #7f8c8d;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e8eef2;
+    }
+
+    .section-header h2 {
+        font-size: 24px;
+        color: #2c3e50;
+        margin: 0;
+    }
+
+    .view-options {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+
+    .btn-style {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-style:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-small {
+        padding: 8px 16px;
+        font-size: 12px;
+    }
+
+    .btn-edit {
+        background-color: #3498db;
+        color: white;
+        margin-right: 8px;
+    }
+
+    .btn-edit:hover {
+        background-color: #2980b9;
+    }
+
+    .btn-delete {
+        background-color: #e74c3c;
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background-color: #c0392b;
+    }
+
+    .teachers-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 24px;
+    }
+
+    .teacher-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        border: 1px solid #e8eef2;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .teacher-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-header {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 20px;
+        align-items: flex-start;
+    }
+
+    .teacher-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .avatar-initial {
+        color: white;
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .teacher-info-header {
+        flex: 1;
+    }
+
+    .teacher-name {
+        font-size: 18px;
+        color: #2c3e50;
+        margin: 0 0 4px 0;
+        font-weight: 600;
+    }
+
+    .teacher-id {
+        font-size: 12px;
+        color: #95a5a6;
+        margin: 0;
+    }
+
+    .card-content {
+        flex: 1;
+        margin-bottom: 20px;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #f0f3f7;
+    }
+
+    .info-row:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+
+    .info-row label {
+        font-weight: 600;
+        color: #7f8c8d;
+        font-size: 13px;
+    }
+
+    .info-row span {
+        color: #2c3e50;
+        font-size: 14px;
+        text-align: right;
+        max-width: 50%;
+        word-break: break-word;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .qualification-badge {
+        background-color: #e8f4f8;
+        color: #0066cc;
+    }
+
+    .experience-badge {
+        background-color: #f0e8f8;
+        color: #6c3483;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .card-footer {
+        display: flex;
+        gap: 8px;
+        padding-top: 16px;
+        border-top: 1px solid #f0f3f7;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: #f8f9fc;
+        border-radius: 12px;
+        border: 2px dashed #dde6f1;
+    }
+
+    .empty-icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+    }
+
+    .empty-state h3 {
+        font-size: 22px;
+        color: #2c3e50;
+        margin: 0 0 10px 0;
+    }
+
+    .empty-state p {
+        color: #7f8c8d;
+        margin: 0;
+        font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+        .academics-container {
+            padding: 20px 15px;
+        }
+
+        .page-header h1 {
+            font-size: 28px;
+        }
+
+        .section-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .teachers-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .info-row {
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .info-row span {
+            max-width: 100%;
+            text-align: left;
+        }
+
+        .card-footer {
+            flex-direction: column;
+        }
+
+        .btn-small {
+            flex: 1;
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}
