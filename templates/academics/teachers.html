@@ -1,368 +1,165 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Teachers - School Management System{% endblock %}
 
 {% block content %}
-<div class="academics-container">
-    <div class="page-header">
-        <h1>👨‍🏫 Teachers</h1>
-        <p class="subtitle">Manage teacher information and details</p>
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-2">👨‍🏫 Teachers Directory</h1>
+            <p class="text-muted">View all teachers in the system</p>
+            <p class="alert alert-info mb-0">
+                <i class="fas fa-info-circle"></i> To add a new teacher, use the <strong>Admin Panel</strong> → Teachers
+            </p>
+        </div>
     </div>
 
-    <main class="main-content">
-        <!-- Teachers List Section -->
-        <section class="teachers-list-section">
-            <div class="section-header">
-                <h2>Teacher Directory</h2>
-                <div class="view-options">
-                    <a href="{% url 'academics:teachers_grid' %}" class="btn btn-style grid-view-btn">
-                        📊 Grid View
-                    </a>
+    <!-- Teachers List -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">📋 Teacher Directory</h6>
+                    <span class="badge bg-primary">{{ teachers.count }} Teachers</span>
+                </div>
+                <div class="card-body">
+                    {% if teachers %}
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Qualification</th>
+                                        <th>Specialization</th>
+                                        <th>Joined On</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for teacher in teachers %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ teacher.user.get_full_name|default:teacher.user.username }}</strong>
+                                            </td>
+                                            <td>{{ teacher.user.username }}</td>
+                                            <td>
+                                                <a href="mailto:{{ teacher.user.email }}">{{ teacher.user.email|default:"-" }}</a>
+                                            </td>
+                                            <td>
+                                                <a href="tel:{{ teacher.user.phone }}">{{ teacher.user.phone|default:"-" }}</a>
+                                            </td>
+                                            <td>
+                                                {% if teacher.qualification %}
+                                                    <span class="badge bg-info">{{ teacher.qualification }}</span>
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ teacher.specialization|default:"-" }}</td>
+                                            <td>
+                                                {% if teacher.joined_on %}
+                                                    {{ teacher.joined_on|date:"d M, Y" }}
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info mb-0">
+                            <strong>No teachers yet!</strong> Contact an admin to add teachers to the system.
+                        </div>
+                    {% endif %}
                 </div>
             </div>
-
-            {% if teachers %}
-                <div class="teachers-grid">
-                    {% for teacher in teachers %}
-                        <div class="teacher-card">
-                            <div class="card-header">
-                                <div class="teacher-avatar">
-                                    <span class="avatar-initial">{{ teacher.user.first_name|first|upper }}</span>
-                                </div>
-                                <div class="teacher-info-header">
-                                    <h3 class="teacher-name">{{ teacher.user.get_full_name|default:teacher.user.username }}</h3>
-                                    <p class="teacher-id">ID: {{ teacher.id }}</p>
-                                </div>
-                            </div>
-
-                            <div class="card-content">
-                                <div class="info-row">
-                                    <label>Email:</label>
-                                    <span>{{ teacher.user.email }}</span>
-                                </div>
-                                <div class="info-row">
-                                    <label>Username:</label>
-                                    <span>{{ teacher.user.username }}</span>
-                                </div>
-                                <div class="info-row">
-                                    <label>Qualification:</label>
-                                    <span class="badge qualification-badge">{{ teacher.qualification|default:"N/A" }}</span>
-                                </div>
-                                <div class="info-row">
-                                    <label>Subject Expertise:</label>
-                                    <span>{{ teacher.subject_expertise|default:"Not specified" }}</span>
-                                </div>
-                                <div class="info-row">
-                                    <label>Experience:</label>
-                                    <span class="experience-badge">{{ teacher.experience_years|default:"0" }} years</span>
-                                </div>
-                                {% if teacher.phone_number %}
-                                    <div class="info-row">
-                                        <label>Phone:</label>
-                                        <span>{{ teacher.phone_number }}</span>
-                                    </div>
-                                {% endif %}
-                                {% if teacher.address %}
-                                    <div class="info-row">
-                                        <label>Address:</label>
-                                        <span>{{ teacher.address }}</span>
-                                    </div>
-                                {% endif %}
-                            </div>
-
-                            <div class="card-footer">
-                                <a href="#" class="btn btn-small btn-edit">✏️ Edit</a>
-                                <a href="#" class="btn btn-small btn-delete">🗑️ Delete</a>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="empty-state">
-                    <div class="empty-icon">👨‍🏫</div>
-                    <h3>No Teachers Found</h3>
-                    <p>There are currently no teachers in the system. Add a teacher to get started.</p>
-                </div>
-            {% endif %}
-        </section>
-    </main>
+        </div>
+    </div>
 </div>
 
 <style>
-    .academics-container {
-        padding: 40px 20px;
-        max-width: 1400px;
-        margin: 0 auto;
-    }
-
-    .page-header {
-        text-align: center;
-        margin-bottom: 40px;
-    }
-
-    .page-header h1 {
-        font-size: 36px;
-        color: #2c3e50;
-        margin-bottom: 10px;
-    }
-
-    .page-header .subtitle {
-        font-size: 16px;
-        color: #7f8c8d;
-    }
-
-    .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 30px;
-        padding-bottom: 20px;
-        border-bottom: 2px solid #e8eef2;
-    }
-
-    .section-header h2 {
-        font-size: 24px;
-        color: #2c3e50;
-        margin: 0;
-    }
-
-    .view-options {
-        display: flex;
-        gap: 10px;
-    }
-
-    .btn {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        text-decoration: none;
-        font-size: 14px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        display: inline-block;
-    }
-
-    .btn-style {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-    }
-
-    .btn-style:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
-    }
-
-    .btn-small {
-        padding: 8px 16px;
-        font-size: 12px;
-    }
-
-    .btn-edit {
-        background-color: #3498db;
-        color: white;
-        margin-right: 8px;
-    }
-
-    .btn-edit:hover {
-        background-color: #2980b9;
-    }
-
-    .btn-delete {
-        background-color: #e74c3c;
-        color: white;
-    }
-
-    .btn-delete:hover {
-        background-color: #c0392b;
-    }
-
-    .teachers-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        gap: 24px;
-    }
-
-    .teacher-card {
-        background: white;
-        border-radius: 12px;
-        padding: 24px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-        border: 1px solid #e8eef2;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .teacher-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    }
-
-    .card-header {
-        display: flex;
-        gap: 16px;
-        margin-bottom: 20px;
-        align-items: flex-start;
-    }
-
-    .teacher-avatar {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-
-    .avatar-initial {
-        color: white;
-        font-size: 24px;
-        font-weight: bold;
-    }
-
-    .teacher-info-header {
-        flex: 1;
-    }
-
-    .teacher-name {
-        font-size: 18px;
-        color: #2c3e50;
-        margin: 0 0 4px 0;
-        font-weight: 600;
-    }
-
-    .teacher-id {
-        font-size: 12px;
-        color: #95a5a6;
-        margin: 0;
-    }
-
-    .card-content {
-        flex: 1;
-        margin-bottom: 20px;
-    }
-
-    .info-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 12px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid #f0f3f7;
-    }
-
-    .info-row:last-child {
+    table.table {
         margin-bottom: 0;
-        padding-bottom: 0;
-        border-bottom: none;
     }
 
-    .info-row label {
+    thead.table-light {
+        background-color: #f9fafb;
+    }
+
+    th {
         font-weight: 600;
-        color: #7f8c8d;
-        font-size: 13px;
+        color: #2c3e50;
+        border-bottom: 2px solid #e5e7eb;
+        padding: 12px 16px;
     }
 
-    .info-row span {
-        color: #2c3e50;
-        font-size: 14px;
-        text-align: right;
-        max-width: 50%;
-        word-break: break-word;
+    td {
+        vertical-align: middle;
+        padding: 12px 16px;
+        color: #4b5563;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f3f4f6;
     }
 
     .badge {
-        display: inline-block;
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 12px;
         font-weight: 500;
+        padding: 6px 12px;
+        border-radius: 4px;
     }
 
-    .qualification-badge {
-        background-color: #e8f4f8;
-        color: #0066cc;
+    .badge.bg-info {
+        background-color: #e3f2fd !important;
+        color: #1976d2;
     }
 
-    .experience-badge {
-        background-color: #f0e8f8;
-        color: #6c3483;
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 500;
+    .card {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
-    .card-footer {
-        display: flex;
-        gap: 8px;
-        padding-top: 16px;
-        border-top: 1px solid #f0f3f7;
+    .card-header {
+        background-color: #f9fafb;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 16px;
     }
 
-    .empty-state {
-        text-align: center;
-        padding: 60px 20px;
-        background: #f8f9fc;
-        border-radius: 12px;
-        border: 2px dashed #dde6f1;
-    }
-
-    .empty-icon {
-        font-size: 64px;
-        margin-bottom: 20px;
-    }
-
-    .empty-state h3 {
-        font-size: 22px;
-        color: #2c3e50;
-        margin: 0 0 10px 0;
-    }
-
-    .empty-state p {
-        color: #7f8c8d;
+    .card-header h6 {
         margin: 0;
-        font-size: 14px;
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .alert {
+        border-radius: 8px;
+        border-left: 4px solid #17a2b8;
+    }
+
+    .text-muted {
+        color: #9ca3af !important;
+    }
+
+    a {
+        color: #667eea;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
     }
 
     @media (max-width: 768px) {
-        .academics-container {
-            padding: 20px 15px;
-        }
-
-        .page-header h1 {
-            font-size: 28px;
-        }
-
-        .section-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 15px;
-        }
-
-        .teachers-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .info-row {
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .info-row span {
-            max-width: 100%;
-            text-align: left;
-        }
-
-        .card-footer {
-            flex-direction: column;
-        }
-
-        .btn-small {
-            flex: 1;
-            text-align: center;
+        th, td {
+            padding: 8px 12px;
+            font-size: 13px;
         }
     }
 </style>

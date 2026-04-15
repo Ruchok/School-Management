@@ -1,0 +1,85 @@
+{% extends 'school_admin/base_admin.html' %}
+
+{% block title %}Routines Management - Admin Panel{% endblock %}
+{% block page_title %}Class Routines/Schedules{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5><i class="fas fa-calendar-alt"></i> Class Schedules</h5>
+            <a href="{% url 'school_admin:routine_create' %}" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus"></i> Add Schedule
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="search-box">
+            <form method="GET" class="w-100" style="display: flex; gap: 10px;">
+                {% if classrooms %}
+                    <select name="classroom" class="form-select" style="max-width: 250px;">
+                        <option value="">All Classes</option>
+                        {% for classroom in classrooms %}
+                            <option value="{{ classroom.id }}" {% if classroom.id|stringformat:"s" == classroom_filter %}selected{% endif %}>{{ classroom.name }}</option>
+                        {% endfor %}
+                    </select>
+                {% endif %}
+                <select name="day" class="form-select" style="max-width: 150px;">
+                    <option value="">All Days</option>
+                    {% for day_key, day_label in days %}
+                        <option value="{{ day_key }}" {% if day_key == day_filter %}selected{% endif %}>{{ day_label }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </form>
+        </div>
+
+        {% if routines %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Class</th>
+                            <th>Subject</th>
+                            <th>Day</th>
+                            <th>Time</th>
+                            <th>Teacher</th>
+                            <th>Room</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for routine in routines %}
+                        <tr>
+                            <td><strong>{{ routine.classroom.name }}</strong></td>
+                            <td>{{ routine.subject.name }}</td>
+                            <td>{{ routine.day_of_week }}</td>
+                            <td>{{ routine.start_time|time:"H:i" }} - {{ routine.end_time|time:"H:i" }}</td>
+                            <td>{{ routine.teacher.user.get_full_name|default:"N/A" }}</td>
+                            <td>{{ routine.room_number|default:"N/A" }}</td>
+                            <td>
+                                <a href="{% url 'school_admin:routine_edit' routine.id %}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <form method="POST" action="{% url 'school_admin:routine_delete' %}" style="display: inline;" onsubmit="return confirm('Are you sure?');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="routine_id" value="{{ routine.id }}">
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="no-data">
+                <i class="fas fa-inbox"></i>
+                <p>No schedules found</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

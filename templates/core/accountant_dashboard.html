@@ -1,0 +1,336 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Accountant Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-2">Finance Dashboard</h1>
+            <p class="text-muted">Welcome, {{ user.get_full_name|default:user.username }}! Manage school finances and fee collections.</p>
+        </div>
+    </div>
+
+    <!-- Financial Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Total Due</p>
+                            <h4 class="mb-0">₹{{ financial_summary.total_due }}</h4>
+                        </div>
+                        <div class="badge bg-danger" style="font-size: 2rem;">📊</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Total Paid</p>
+                            <h4 class="mb-0">₹{{ financial_summary.total_paid }}</h4>
+                        </div>
+                        <div class="badge bg-success" style="font-size: 2rem;">✓</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Outstanding</p>
+                            <h4 class="mb-0">₹{{ financial_summary.balance_pending }}</h4>
+                        </div>
+                        <div class="badge bg-warning" style="font-size: 2rem;">⚠️</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Total Revenue</p>
+                            <h4 class="mb-0">₹{{ financial_summary.total_revenue }}</h4>
+                        </div>
+                        <div class="badge bg-info" style="font-size: 2rem;">💰</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoice Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Total Invoices</p>
+                            <h4 class="mb-0">{{ stats.total_invoices }}</h4>
+                        </div>
+                        <div class="badge bg-primary" style="font-size: 2rem;">📄</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Pending</p>
+                            <h4 class="mb-0">{{ stats.pending_invoices }}</h4>
+                        </div>
+                        <div class="badge bg-danger" style="font-size: 2rem;">⏳</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Partial</p>
+                            <h4 class="mb-0">{{ stats.partial_invoices }}</h4>
+                        </div>
+                        <div class="badge bg-warning" style="font-size: 2rem;">◐</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Paid</p>
+                            <h4 class="mb-0">{{ stats.paid_invoices }}</h4>
+                        </div>
+                        <div class="badge bg-success" style="font-size: 2rem;">✓</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoice Status Breakdown -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Invoice Status Breakdown</h6>
+                </div>
+                <div class="card-body">
+                    {% if invoice_status_breakdown %}
+                        <table class="table table-sm table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Count</th>
+                                    <th>%</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for invoice in invoice_status_breakdown %}
+                                    <tr>
+                                        <td>
+                                            {% if invoice.status == "PAID" %}
+                                                <span class="badge bg-success">Paid</span>
+                                            {% elif invoice.status == "PARTIAL" %}
+                                                <span class="badge bg-warning">Partial</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Pending</span>
+                                            {% endif %}
+                                        </td>
+                                        <td><strong>{{ invoice.count }}</strong></td>
+                                        <td>{{ invoice.count|add:"0"|floatformat:0 }}%</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p class="text-muted">No invoices yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Payment Methods</h6>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Payment method breakdown will be displayed here.</p>
+                    <ul>
+                        <li>Cash Payments</li>
+                        <li>Bank Transfers</li>
+                        <li>Mobile Banking</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Invoices -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Pending Invoices (Top 10)</h6>
+                </div>
+                <div class="card-body">
+                    {% if pending_invoices %}
+                        <div class="table-responsive">
+                            <table class="table table-sm table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Fee Type</th>
+                                        <th>Amount Due</th>
+                                        <th>Amount Paid</th>
+                                        <th>Balance</th>
+                                        <th>Issued On</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for invoice in pending_invoices %}
+                                        <tr>
+                                            <td>{{ invoice.student.user.get_full_name|default:invoice.student.user.username }}</td>
+                                            <td>{{ invoice.fee_structure.title }}</td>
+                                            <td>₹{{ invoice.amount_due }}</td>
+                                            <td>₹{{ invoice.amount_paid }}</td>
+                                            <td>₹{{ invoice.amount_due|add:invoice.amount_paid|floatformat:"-2" }}</td>
+                                            <td>{{ invoice.issued_on|date:"d M, Y" }}</td>
+                                            <td>
+                                                <a href="{% url 'admin:finance_feeinvoice_change' invoice.id %}" class="btn btn-sm btn-primary">
+                                                    View
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No pending invoices.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Invoices & Payments -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Recent Invoices</h6>
+                </div>
+                <div class="card-body">
+                    {% if recent_invoices %}
+                        <table class="table table-sm table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for invoice in recent_invoices %}
+                                    <tr>
+                                        <td>{{ invoice.student.user.get_full_name|default:invoice.student.user.username }}</td>
+                                        <td>₹{{ invoice.amount_due }}</td>
+                                        <td>
+                                            {% if invoice.status == "PAID" %}
+                                                <span class="badge bg-success">Paid</span>
+                                            {% elif invoice.status == "PARTIAL" %}
+                                                <span class="badge bg-warning">Partial</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Pending</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p class="text-muted">No invoices yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Recent Payments</h6>
+                </div>
+                <div class="card-body">
+                    {% if recent_payments %}
+                        <table class="table table-sm table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Amount</th>
+                                    <th>Method</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in recent_payments %}
+                                    <tr>
+                                        <td>{{ payment.invoice.student.user.get_full_name|default:payment.invoice.student.user.username }}</td>
+                                        <td>₹{{ payment.amount }}</td>
+                                        <td>
+                                            <span class="badge bg-info">{{ payment.get_method_display }}</span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p class="text-muted">No payments yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'admin:finance_feeinvoice_add' %}" class="btn btn-outline-primary me-2">Create Invoice</a>
+                    <a href="{% url 'admin:finance_feepayment_add' %}" class="btn btn-outline-success me-2">Record Payment</a>
+                    <a href="{% url 'finance:payments' %}" class="btn btn-outline-info me-2">View All Payments</a>
+                    <a href="{% url 'finance:invoices' %}" class="btn btn-outline-warning">View All Invoices</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

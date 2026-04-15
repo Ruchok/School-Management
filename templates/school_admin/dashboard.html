@@ -1,0 +1,254 @@
+{% extends 'school_admin/base_admin.html' %}
+{% load humanize %}
+
+{% block title %}Admin Dashboard - School Management{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Statistics -->
+    <div class="col-md-2 col-sm-6 mb-3">
+        <div class="stat-card">
+            <div class="icon"><i class="fas fa-graduation-cap"></i></div>
+            <div class="number">{{ total_students }}</div>
+            <div class="label">Total Students</div>
+        </div>
+    </div>
+
+    <div class="col-md-2 col-sm-6 mb-3">
+        <div class="stat-card">
+            <div class="icon"><i class="fas fa-chalkboard-user"></i></div>
+            <div class="number">{{ total_teachers }}</div>
+            <div class="label">Total Teachers</div>
+        </div>
+    </div>
+
+    <div class="col-md-2 col-sm-6 mb-3">
+        <div class="stat-card">
+            <div class="icon"><i class="fas fa-book"></i></div>
+            <div class="number">{{ total_classes }}</div>
+            <div class="label">Total Classes</div>
+        </div>
+    </div>
+
+    <div class="col-md-2 col-sm-6 mb-3">
+        <div class="stat-card">
+            <div class="icon"><i class="fas fa-calendar-alt"></i></div>
+            <div class="number">{{ total_routines }}</div>
+            <div class="label">Class Routines</div>
+        </div>
+    </div>
+
+    <div class="col-md-2 col-sm-6 mb-3">
+        <div class="stat-card">
+            <div class="icon"><i class="fas fa-users"></i></div>
+            <div class="number">{{ total_users }}</div>
+            <div class="label">Total Users</div>
+        </div>
+    </div>
+
+    <div class="col-md-2 col-sm-6 mb-3">
+        <div class="stat-card">
+            <div class="icon"><i class="fas fa-book-open"></i></div>
+            <div class="number">{{ total_subjects }}</div>
+            <div class="label">Total Subjects</div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Statistics -->
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-money-bill-wave"></i> Payment Status
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-sm-4">
+                        <h4 style="color: #ff9100;">{{ total_pending }}</h4>
+                        <small>Pending</small>
+                    </div>
+                    <div class="col-sm-4">
+                        <h4 style="color: #2196f3;">{{ total_partial }}</h4>
+                        <small>Partial</small>
+                    </div>
+                    <div class="col-sm-4">
+                        <h4 style="color: #4caf50;">{{ total_paid }}</h4>
+                        <small>Paid</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-bolt"></i> Quick Actions
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-3 mb-2">
+                        <a href="{% url 'school_admin:student_create' %}" class="btn btn-primary btn-sm w-100">
+                            <i class="fas fa-plus"></i> Add Student
+                        </a>
+                    </div>
+                    <div class="col-sm-3 mb-2">
+                        <a href="{% url 'school_admin:teacher_create' %}" class="btn btn-primary btn-sm w-100">
+                            <i class="fas fa-plus"></i> Add Teacher
+                        </a>
+                    </div>
+                    <div class="col-sm-3 mb-2">
+                        <a href="{% url 'school_admin:payment_create' %}" class="btn btn-success btn-sm w-100">
+                            <i class="fas fa-plus"></i> New Payment
+                        </a>
+                    </div>
+                    <div class="col-sm-3 mb-2">
+                        <a href="{% url 'school_admin:routine_create' %}" class="btn btn-warning btn-sm w-100">
+                            <i class="fas fa-plus"></i> Add Schedule
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Data -->
+<div class="row mt-4">
+    <!-- Recent Students -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-user-graduate"></i> Recently Added Students
+            </div>
+            <div class="card-body">
+                {% if recent_students %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Roll</th>
+                                    <th>Class</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in recent_students %}
+                                <tr>
+                                    <td>{{ student.user.get_full_name|truncatewords:2 }}</td>
+                                    <td>{{ student.roll_number }}</td>
+                                    <td>{{ student.classroom.name }}</td>
+                                    <td><small>{{ student.admission_date|date:"d-M-y" }}</small></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="no-data">
+                        <i class="fas fa-inbox"></i>
+                        <p>No students yet</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Teachers -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chalkboard-user"></i> Recently Added Teachers
+            </div>
+            <div class="card-body">
+                {% if recent_teachers %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Specialization</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for teacher in recent_teachers %}
+                                <tr>
+                                    <td>{{ teacher.user.get_full_name|truncatewords:2 }}</td>
+                                    <td><small>{{ teacher.user.email }}</small></td>
+                                    <td><small>{{ teacher.specialization }}</small></td>
+                                    <td><small>{{ teacher.joined_on|date:"d-M-y" }}</small></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="no-data">
+                        <i class="fas fa-inbox"></i>
+                        <p>No teachers yet</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Payments -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-receipt"></i> Recent Payments
+            </div>
+            <div class="card-body">
+                {% if recent_payments %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Amount</th>
+                                    <th>Method</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in recent_payments %}
+                                <tr>
+                                    <td>{{ payment.invoice.student.user.get_full_name }}</td>
+                                    <td><strong>{{ payment.amount }}</strong></td>
+                                    <td><span class="badge" style="background: #667eea;">{{ payment.method }}</span></td>
+                                    <td><small>{{ payment.payment_date|date:"d-M-y" }}</small></td>
+                                    <td>
+                                        {% if payment.invoice.status == "PAID" %}
+                                            <span class="badge" style="background: #4caf50;">PAID</span>
+                                        {% elif payment.invoice.status == "PARTIAL" %}
+                                            <span class="badge" style="background: #2196f3;">PARTIAL</span>
+                                        {% else %}
+                                            <span class="badge" style="background: #ff9100;">PENDING</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="no-data">
+                        <i class="fas fa-inbox"></i>
+                        <p>No payments recorded yet</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

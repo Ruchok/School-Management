@@ -45,7 +45,9 @@
             <a href="{% url 'finance:structures' %}">Fee Structures</a>
             <a href="{% url 'finance:invoices' %}">Invoices</a>
             <a href="{% url 'finance:payments' %}">Payments</a>
-            <a href="{% url 'admin:index' %}">Admin</a>
+            <hr style="margin: 15px 0; border: none; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+            <a href="{% url 'school_admin:login' %}" style="color: #ff6b6b; font-weight: 500;">🛡️ School Admin</a>
+            <a href="{% url 'admin:index' %}">Django Admin</a>
         </nav>
     </aside>
     {% endif %}

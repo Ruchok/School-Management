@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}শিক্ষার্থী পরিচালনা - স্কুল অ্যাডমিন{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1">👥 শিক্ষার্থী পরিচালনা</h1>
+                    <p class="text-muted mb-0">সব শিক্ষার্থী দেখুন এবং পরিচালনা করুন</p>
+                </div>
+                <a href="{% url 'school_admin:dashboard' %}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-arrow-left"></i> ফিরে যান
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Students List -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">📚 সমস্ত শিক্ষার্থী</h6>
+                    <span class="badge bg-success">{{ students.count }} শিক্ষার্থী</span>
+                </div>
+                <div class="card-body">
+                    {% if students %}
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>নাম</th>
+                                        <th>ব্যবহারকারী নাম</th>
+                                        <th>ইমেইল</th>
+                                        <th>রোল নম্বর</th>
+                                        <th>ক্লাস</th>
+                                        <th>ভর্তির তারিখ</th>
+                                        <th class="text-center">পদক্ষেপ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for student in students %}
+                                        <tr>
+                                            <td><strong>{{ student.user.get_full_name }}</strong></td>
+                                            <td>{{ student.user.username }}</td>
+                                            <td>{{ student.user.email|default:"-" }}</td>
+                                            <td><span class="badge bg-warning">{{ student.roll_number }}</span></td>
+                                            <td>{{ student.classroom.name }}</td>
+                                            <td>{{ student.admission_date|date:"d M, Y" }}</td>
+                                            <td class="text-center">
+                                                <form method="POST" style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="action" value="delete">
+                                                    <input type="hidden" name="student_id" value="{{ student.id }}">
+                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('আপনি কি এই শিক্ষার্থীকে মুছে ফেলতে চান?')">
+                                                        <i class="fas fa-trash"></i> মুছুন
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info mb-0">
+                            <i class="fas fa-info-circle"></i> কোনো শিক্ষার্থী নেই।
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .table th {
+            font-weight: 600;
+            color: #2c3e50;
+            border-bottom: 2px solid #e5e7eb;
+            padding: 12px 16px;
+        }
+
+        .table td {
+            vertical-align: middle;
+            padding: 12px 16px;
+            color: #4b5563;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #f3f4f6;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+    </style>
+</div>
+{% endblock %}

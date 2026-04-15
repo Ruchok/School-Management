@@ -1,0 +1,72 @@
+{% extends 'school_admin/base_admin.html' %}
+
+{% block title %}Teacher Management - Admin Panel{% endblock %}
+{% block page_title %}Teacher Management{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5><i class="fas fa-chalkboard-user"></i> Teachers</h5>
+            <a href="{% url 'school_admin:teacher_create' %}" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus"></i> Add New Teacher
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="search-box">
+            <form method="GET" class="w-100" style="display: flex; gap: 10px;">
+                <input type="text" name="search" class="form-control" placeholder="Search by name, email, or specialization" value="{{ search }}">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+
+        {% if teachers %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Qualification</th>
+                            <th>Specialization</th>
+                            <th>Joined</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for teacher in teachers %}
+                        <tr>
+                            <td><strong>{{ teacher.user.get_full_name }}</strong></td>
+                            <td>{{ teacher.user.email|default:"N/A" }}</td>
+                            <td>{{ teacher.user.phone|default:"N/A" }}</td>
+                            <td><span class="badge" style="background: #667eea;">{{ teacher.qualification }}</span></td>
+                            <td>{{ teacher.specialization }}</td>
+                            <td><small>{{ teacher.joined_on|date:"d-M-Y" }}</small></td>
+                            <td>
+                                <a href="{% url 'school_admin:teacher_edit' teacher.id %}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <form method="POST" action="{% url 'school_admin:teacher_delete' %}" style="display: inline;" onsubmit="return confirm('Are you sure?');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="teacher_id" value="{{ teacher.id }}">
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="no-data">
+                <i class="fas fa-inbox"></i>
+                <p>No teachers found</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

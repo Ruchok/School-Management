@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}শিক্ষক পরিচালনা - স্কুল অ্যাডমিন{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1">👨‍🏫 শিক্ষক পরিচালনা</h1>
+                    <p class="text-muted mb-0">সব শিক্ষক দেখুন এবং পরিচালনা করুন</p>
+                </div>
+                <a href="{% url 'school_admin:dashboard' %}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-arrow-left"></i> ফিরে যান
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Teachers List -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">🎓 সমস্ত শিক্ষক</h6>
+                    <span class="badge bg-primary">{{ teachers.count }} শিক্ষক</span>
+                </div>
+                <div class="card-body">
+                    {% if teachers %}
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>নাম</th>
+                                        <th>ব্যবহারকারী নাম</th>
+                                        <th>ইমেইল</th>
+                                        <th>ফোন</th>
+                                        <th>যোগ্যতা</th>
+                                        <th>বিশেষত্ব</th>
+                                        <th>যোগদানের তারিখ</th>
+                                        <th class="text-center">পদক্ষেপ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for teacher in teachers %}
+                                        <tr>
+                                            <td><strong>{{ teacher.user.get_full_name }}</strong></td>
+                                            <td>{{ teacher.user.username }}</td>
+                                            <td>{{ teacher.user.email|default:"-" }}</td>
+                                            <td>{{ teacher.user.phone|default:"-" }}</td>
+                                            <td>
+                                                {% if teacher.qualification %}
+                                                    <span class="badge bg-info">{{ teacher.qualification }}</span>
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ teacher.specialization|default:"-" }}</td>
+                                            <td>
+                                                {% if teacher.joined_on %}
+                                                    {{ teacher.joined_on|date:"d M, Y" }}
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-center">
+                                                <form method="POST" style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="action" value="delete">
+                                                    <input type="hidden" name="teacher_id" value="{{ teacher.id }}">
+                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('আপনি কি এই শিক্ষককে মুছে ফেলতে চান?')">
+                                                        <i class="fas fa-trash"></i> মুছুন
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info mb-0">
+                            <i class="fas fa-info-circle"></i> কোনো শিক্ষক নেই।
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .table th {
+            font-weight: 600;
+            color: #2c3e50;
+            border-bottom: 2px solid #e5e7eb;
+            padding: 12px 16px;
+        }
+
+        .table td {
+            vertical-align: middle;
+            padding: 12px 16px;
+            color: #4b5563;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #f3f4f6;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+    </style>
+</div>
+{% endblock %}

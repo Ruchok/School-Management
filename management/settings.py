@@ -43,12 +43,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'core',
     'users',
     'academics',
     'attendance',
     'exams',
     'finance',
+    'school_admin',
 ]
 
 MIDDLEWARE = [
@@ -84,9 +86,9 @@ WSGI_APPLICATION = 'management.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-# Configure database from environment. Defaults to MySQL.
-# To keep using SQLite for quick local dev set USE_SQLITE=True in environment
-DB_ENGINE = os.getenv('DB_ENGINE', 'django.db.backends.mysql')
+# Configure database from environment. Defaults to SQLite for local development.
+# To use MySQL, set DB_ENGINE=django.db.backends.mysql in environment
+DB_ENGINE = os.getenv('DB_ENGINE', 'django.db.backends.sqlite3')
 DB_NAME = os.getenv('DB_NAME', 'school_db')
 DB_USER = os.getenv('DB_USER', 'root')
 DB_PASSWORD = os.getenv('DB_PASSWORD', '')
@@ -169,3 +171,6 @@ LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'login'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# School Admin Panel Settings
+SCHOOL_ADMIN_PASSWORD = 'School@Admin123'  # Change this to a secure password
