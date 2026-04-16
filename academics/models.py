@@ -53,13 +53,14 @@ class Subject(models.Model):
 class StudentProfile(models.Model):
 	user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 	classroom = models.ForeignKey(SchoolClass, on_delete=models.SET_NULL, null=True, blank=True)
-	roll_number = models.CharField(max_length=20, unique=True)
+	roll_number = models.CharField(max_length=20)
 	admission_date = models.DateField()
 	guardian_name = models.CharField(max_length=120)
 	guardian_phone = models.CharField(max_length=20)
 
 	class Meta:
 		ordering = ["roll_number"]
+		unique_together = ('classroom', 'roll_number')
 
 	def __str__(self):
 		return f"{self.roll_number} - {self.user.get_full_name() or self.user.username}"

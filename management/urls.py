@@ -5,12 +5,12 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
 
-from core.views import DashboardView, HomeRedirectView
+from core.views import DashboardView, HomeRedirectView, LoginView
 
 urlpatterns = [
     path('', HomeRedirectView.as_view(), name='home'),
     path('dashboard/', DashboardView.as_view(), name='dashboard'),
-    path('login/', auth_views.LoginView.as_view(template_name='auth/login.html'), name='login'),
+    path('login/', LoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('admin/', admin.site.urls),
     path('school-admin/', include('school_admin.urls')),

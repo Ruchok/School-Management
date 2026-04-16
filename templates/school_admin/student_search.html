@@ -1,0 +1,179 @@
+{% extends 'school_admin/base_admin.html' %}
+
+{% block title %}Student Search - Admin Panel{% endblock %}
+{% block page_title %}Search Student & View Routine{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-search"></i> Search Student by Name</h5>
+            </div>
+            <div class="card-body">
+                <form method="get" class="mb-4">
+                    <div class="input-group">
+                        <input 
+                            type="text" 
+                            name="q" 
+                            value="{{ query }}"
+                            placeholder="Enter student name, username, or roll number..."
+                            class="form-control form-control-lg"
+                            autofocus
+                        />
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </form>
+
+                {% if query %}
+                    {% if results %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Found <strong>{{ count }}</strong> student(s)
+                        </div>
+
+                        {% for student in results %}
+                        <div class="card mb-4" style="border-left: 5px solid #667eea;">
+                            <div class="card-header" style="background: #f8f9fa;">
+                                <div class="row align-items-center">
+                                    <div class="col-md-6">
+                                        <h5 style="margin: 0;">
+                                            <i class="fas fa-user-graduate"></i> 
+                                            <strong>{{ student.user.get_full_name }}</strong>
+                                        </h5>
+                                        <small class="text-muted">Roll: {{ student.roll_number }} | Username: {{ student.user.username }}</small>
+                                    </div>
+                                    <div class="col-md-6 text-end">
+                                        <span class="badge" style="background: #667eea; padding: 8px 12px; font-size: 13px;">
+                                            <i class="fas fa-book"></i> {{ student.classroom.name }} - {{ student.classroom.section }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <p><strong>Email:</strong><br><small>{{ student.user.email|default:"N/A" }}</small></p>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <p><strong>Guardian:</strong><br><small>{{ student.guardian_name }}</small></p>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <p><strong>Guardian Phone:</strong><br><small>{{ student.guardian_phone }}</small></p>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <p><strong>Admission Date:</strong><br><small>{{ student.admission_date|date:"d-M-Y" }}</small></p>
+                                    </div>
+                                </div>
+
+                                <!-- Class Routine -->
+                                <div class="mt-4">
+                                    <h6 style="color: #333; margin-bottom: 12px;">
+                                        <i class="fas fa-calendar-alt"></i> Class Routine
+                                    </h6>
+                                    
+                                    {% if student.routine %}
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-bordered">
+                                                <thead style="background: #f0f0f0;">
+                                                    <tr>
+                                                        <th width="15%">Day</th>
+                                                        <th width="25%">Subject</th>
+                                                        <th width="20%">Teacher</th>
+                                                        <th width="15%">Time</th>
+                                                        <th width="15%">Room</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for routine in student.routine %}
+                                                    <tr>
+                                                        <td>
+                                                            <span class="badge" style="background: #667eea;">
+                                                                {{ routine.day_of_week }}
+                                                            </span>
+                                                        </td>
+                                                        <td><strong>{{ routine.subject.name }}</strong></td>
+                                                        <td>{{ routine.teacher.user.get_full_name|default:"TBA" }}</td>
+                                                        <td>
+                                                            {{ routine.start_time|time:"H:i" }} - {{ routine.end_time|time:"H:i" }}
+                                                        </td>
+                                                        <td>{{ routine.room_number|default:"-" }}</td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    {% else %}
+                                        <div class="alert alert-warning mb-0">
+                                            <i class="fas fa-exclamation-circle"></i> No routine set for this class yet
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="mt-3">
+                                    <a href="{% url 'school_admin:student_edit' student.pk %}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <a href="{% url 'school_admin:students_list' %}" class="btn btn-sm btn-secondary">
+                                        <i class="fas fa-arrow-left"></i> Back
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-search"></i> No students found matching "<strong>{{ query }}</strong>"
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div style="text-align: center; padding: 60px 20px; color: #999;">
+                        <i class="fas fa-search" style="font-size: 48px; margin-bottom: 20px; opacity: 0.3;"></i>
+                        <h4>Start Searching</h4>
+                        <p>Enter a student name, username, or roll number to search and view their routine</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .input-group {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .form-control-lg {
+        padding: 12px 16px;
+        font-size: 15px;
+    }
+
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: none;
+    }
+
+    .btn-primary {
+        background: #667eea;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background: #5568d3;
+    }
+
+    .table-responsive {
+        border-radius: 4px;
+        border: 1px solid #e9ecef;
+    }
+
+    .badge {
+        font-weight: 500;
+        padding: 6px 10px;
+    }
+</style>
+{% endblock %}

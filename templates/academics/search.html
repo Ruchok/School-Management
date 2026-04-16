@@ -43,7 +43,39 @@
                                 <p><strong>Guardian:</strong> {{ student.guardian_name }}</p>
                                 <p><strong>Phone:</strong> {{ student.guardian_phone }}</p>
                             </div>
-                            <div class="result-actions">
+                            
+                            <!-- Class Routine -->
+                            {% if student.routine %}
+                            <div style="margin-top: 16px; padding-top: 16px; border-top: 2px solid #f0f0f0;">
+                                <h5 style="margin-bottom: 12px; color: #0d2f23; font-size: 14px;"><i class="fas fa-calendar-alt"></i> Class Routine</h5>
+                                <div style="overflow-x: auto;">
+                                    <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
+                                        <thead>
+                                            <tr style="background: #f0f0f0;">
+                                                <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;">Day</th>
+                                                <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;">Subject</th>
+                                                <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;">Teacher</th>
+                                                <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;">Time</th>
+                                                <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;">Room</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for routine in student.routine %}
+                                            <tr style="border-bottom: 1px solid #e0e0e0;">
+                                                <td style="padding: 8px;">{{ routine.day_of_week }}</td>
+                                                <td style="padding: 8px;"><strong>{{ routine.subject.name }}</strong></td>
+                                                <td style="padding: 8px;">{{ routine.teacher.user.get_full_name|default:"TBA" }}</td>
+                                                <td style="padding: 8px;">{{ routine.start_time|time:"H:i" }} - {{ routine.end_time|time:"H:i" }}</td>
+                                                <td style="padding: 8px;">{{ routine.room_number|default:"-" }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="result-actions" style="margin-top: 16px;">
                                 <a href="{% url 'academics:students' %}" class="btn" style="padding: 8px 12px; font-size: 13px;">View All</a>
                             </div>
                         </div>

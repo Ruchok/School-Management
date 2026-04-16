@@ -5,6 +5,7 @@ from django.db.models import Q
 
 from .forms import SchoolClassForm, StudentCreateForm, SubjectForm
 from .models import SchoolClass, StudentProfile, Subject, TeacherProfile
+from school_admin.models import ClassRoutine
 
 
 class ClassListCreateView(LoginRequiredMixin, View):
@@ -45,17 +46,7 @@ class StudentListCreateView(LoginRequiredMixin, View):
 	template_name = "academics/students.html"
 
 	def get(self, request):
-		form = StudentCreateForm()
-		students = StudentProfile.objects.select_related("user", "classroom")
-		return render(request, self.template_name, {"form": form, "students": students})
-
-	def post(self, request):
-		form = StudentCreateForm(request.POST)
-		if form.is_valid():
-			form.save()
-			return redirect("academics:students")
-		students = StudentProfile.objects.select_related("user", "classroom")
-		return render(request, self.template_name, {"form": form, "students": students})
+		return render(request, self.template_name)
 
 
 class StudentSearchView(LoginRequiredMixin, View):
@@ -73,6 +64,12 @@ class StudentSearchView(LoginRequiredMixin, View):
 				Q(roll_number__icontains=query) |
 				Q(classroom__name__icontains=query)
 			)
+			
+			# Add routine information to each student
+			for student in results:
+				student.routine = ClassRoutine.objects.filter(
+					classroom=student.classroom
+				).select_related('subject', 'teacher__user').order_by('day_of_week', 'start_time')
 		
 		return render(request, self.template_name, {
 			"query": query,

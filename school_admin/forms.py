@@ -40,6 +40,30 @@ class StudentForm(forms.ModelForm):
             raise forms.ValidationError('This username is already taken. Please choose another one.')
         return username
     
+    def clean(self):
+        cleaned_data = super().clean()
+        roll_number = cleaned_data.get('roll_number')
+        classroom = cleaned_data.get('classroom')
+        
+        if roll_number and classroom:
+            # Check if roll number already exists in this classroom
+            existing = StudentProfile.objects.filter(
+                roll_number=roll_number,
+                classroom=classroom
+            )
+            
+            # If editing, exclude the current student
+            if self.instance.pk:
+                existing = existing.exclude(pk=self.instance.pk)
+            
+            if existing.exists():
+                raise forms.ValidationError(
+                    f'Roll number "{roll_number}" already exists in class "{classroom}". '
+                    'Each student in the same class must have a unique roll number.'
+                )
+        
+        return cleaned_data
+    
     def save(self, commit=True):
         student = super().save(commit=False)
         

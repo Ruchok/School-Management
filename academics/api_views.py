@@ -110,7 +110,7 @@ def payments_data_api(request):
     """Return payments data as JSON for AG Grid"""
     payments = FeePayment.objects.select_related('invoice__student__user').values(
         'id', 'invoice__student__user__first_name', 
-        'invoice__student__user__last_name', 'amount', 'payment_date', 'payment_method'
+        'invoice__student__user__last_name', 'amount', 'payment_date', 'method'
     ).order_by('-payment_date')
     
     data = [
@@ -119,7 +119,7 @@ def payments_data_api(request):
             'student': f"{p['invoice__student__user__first_name']} {p['invoice__student__user__last_name']}".strip(),
             'amount': str(p['amount']),
             'date': p['payment_date'].strftime('%Y-%m-%d'),
-            'method': p['payment_method']
+            'method': p['method']
         }
         for p in payments
     ]

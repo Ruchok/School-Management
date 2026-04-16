@@ -22,6 +22,36 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
+        .language-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .lang-btn {
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .lang-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .lang-btn:hover {
+            transform: translateY(-2px);
+        }
+
         .login-container {
             background: white;
             border-radius: 15px;
@@ -115,10 +145,6 @@
             box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
         }
 
-        .form-control::placeholder {
-            color: #999;
-        }
-
         .btn-login {
             width: 100%;
             padding: 12px;
@@ -162,12 +188,18 @@
     </style>
 </head>
 <body>
+    <!-- Language Toggle -->
+    <div class="language-toggle">
+        <button class="lang-btn active" onclick="setLanguage('en')">English</button>
+        <button class="lang-btn" onclick="setLanguage('bn')">বাংলা</button>
+    </div>
+
     <div class="login-container">
         <!-- Header -->
         <div class="login-header">
             <i class="fas fa-shield-alt"></i>
-            <h2>Admin Panel</h2>
-            <p>School Management System</p>
+            <h2 id="header-title">Admin Panel</h2>
+            <p id="header-subtitle">School Management System</p>
         </div>
 
         <!-- Body -->
@@ -185,18 +217,23 @@
                 {% csrf_token %}
                 
                 <div class="form-group">
-                    <label class="form-label"><i class="fas fa-lock"></i> Admin Password</label>
-                    <input type="password" name="password" class="form-control" placeholder="Enter admin password" required autofocus>
+                    <label class="form-label"><i class="fas fa-lock"></i> <span id="label-password">Admin Password</span></label>
+                    <input type="password" name="password" class="form-control" id="password-input" placeholder="Enter admin password" required autofocus>
                 </div>
 
                 <button type="submit" class="btn-login">
-                    <i class="fas fa-sign-in-alt"></i> Login
+                    <i class="fas fa-sign-in-alt"></i> <span id="btn-login">Login</span>
                 </button>
             </form>
 
             <div class="security-note">
                 <i class="fas fa-info-circle"></i>
-                <strong>Security Note:</strong> This panel is protected. Only authorized administrators can access it.
+                <strong id="security-title">Security Note:</strong> 
+                <span id="security-text">This panel is protected. Only authorized administrators can access it.</span>
+                <div style="margin-top: 10px; font-size: 12px; opacity: 0.9;">
+                    <div id="admin-hint">• School Admin: Limited access to students and teachers</div>
+                    <div id="principle-hint">• Principle Admin: Full access to entire system</div>
+                </div>
             </div>
 
             <div class="footer-text">
@@ -206,227 +243,63 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>স্কুল অ্যাডমিন প্যানেল - লগইন</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .login-container {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-            width: 100%;
-            max-width: 420px;
-        }
-
-        .login-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 40px 20px;
-            text-align: center;
-        }
-
-        .login-header h1 {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .login-header p {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        .login-header .icon {
-            font-size: 48px;
-            margin-bottom: 15px;
-            display: inline-block;
-        }
-
-        .login-body {
-            padding: 40px;
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e5e7eb;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .btn-login {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-login:active {
-            transform: translateY(0);
-        }
-
-        .messages {
-            margin-bottom: 20px;
-        }
-
-        .alert {
-            border-radius: 6px;
-            border-left: 4px solid;
-            padding: 12px 15px;
-            font-size: 13px;
-        }
-
-        .alert-success {
-            background-color: #d4edda;
-            border-left-color: #28a745;
-            color: #155724;
-        }
-
-        .alert-error {
-            background-color: #f8d7da;
-            border-left-color: #dc3545;
-            color: #721c24;
-        }
-
-        .security-note {
-            background: #f0f4ff;
-            border-left: 4px solid #667eea;
-            padding: 12px 15px;
-            border-radius: 4px;
-            font-size: 12px;
-            color: #404b74;
-            margin-top: 20px;
-        }
-
-        .security-note i {
-            margin-right: 8px;
-            color: #667eea;
-        }
-
-        @media (max-width: 480px) {
-            .login-container {
-                margin: 20px;
+    <script>
+        const translations = {
+            en: {
+                'header-title': 'Admin Panel',
+                'header-subtitle': 'School Management System',
+                'label-password': 'Admin Password',
+                'password-input': 'Enter admin password',
+                'btn-login': 'Login',
+                'security-title': 'Security Note:',
+                'security-text': 'This panel is protected. Only authorized administrators can access it.',
+                'admin-hint': '• School Admin: Limited access to students and teachers',
+                'principle-hint': '• Principle Admin: Full access to entire system'
+            },
+            bn: {
+                'header-title': 'অ্যাডমিন প্যানেল',
+                'header-subtitle': 'স্কুল ম্যানেজমেন্ট সিস্টেম',
+                'label-password': 'অ্যাডমিন পাসওয়ার্ড',
+                'password-input': 'অ্যাডমিন পাসওয়ার্ড প্রবেশ করুন',
+                'btn-login': 'লগইন',
+                'security-title': 'নিরাপত্তা বিজ্ঞপ্তি:',
+                'security-text': 'এই প্যানেলটি সুরক্ষিত। শুধুমাত্র অনুমোদিত প্রশাসকরা এটি অ্যাক্সেস করতে পারেন।',
+                'admin-hint': '• স্কুল অ্যাডমিন: শিক্ষার্থী এবং শিক্ষকদের সীমিত অ্যাক্সেস',
+                'principle-hint': '• প্রিন্সিপাল অ্যাডমিন: সম্পূর্ণ সিস্টেম অ্যাক্সেস'
             }
+        };
 
-            .login-header {
-                padding: 30px 20px;
-            }
-
-            .login-header h1 {
-                font-size: 24px;
-            }
-
-            .login-body {
-                padding: 30px;
-            }
+        function setLanguage(lang) {
+            localStorage.setItem('language', lang);
+            
+            // Update buttons
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update text
+            Object.keys(translations[lang]).forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    if (id === 'password-input') {
+                        element.placeholder = translations[lang][id];
+                    } else {
+                        element.textContent = translations[lang][id];
+                    }
+                }
+            });
+            
+            // Set HTML lang attribute
+            document.documentElement.lang = lang;
         }
-    </style>
-</head>
-<body>
-    <div class="login-container">
-        <div class="login-header">
-            <div class="icon">
-                <i class="fas fa-shield-alt"></i>
-            </div>
-            <h1>স্কুল অ্যাডমিন</h1>
-            <p>পাসওয়ার্ড দিয়ে লগইন করুন</p>
-        </div>
 
-        <div class="login-body">
-            {% if messages %}
-                <div class="messages">
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }}">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-
-            <form method="POST">
-                {% csrf_token %}
-                
-                <div class="form-group">
-                    <label for="password">
-                        <i class="fas fa-lock"></i> পাসওয়ার্ড
-                    </label>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        name="password" 
-                        placeholder="আপনার পাসওয়ার্ড এখানে লিখুন"
-                        required 
-                        autofocus
-                    >
-                </div>
-
-                <button type="submit" class="btn-login">
-                    <i class="fas fa-sign-in-alt"></i> লগইন করুন
-                </button>
-            </form>
-
-            <div class="security-note">
-                <i class="fas fa-info-circle"></i>
-                এটি শুধুমাত্র অনুমোদিত স্কুল প্রশাসকদের জন্য। অননুমোদিত অ্যাক্সেস নিষিদ্ধ।
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        // Load saved language or default to English
+        const savedLanguage = localStorage.getItem('language') || 'en';
+        if (savedLanguage === 'bn') {
+            setTimeout(() => {
+                const buttons = document.querySelectorAll('.lang-btn');
+                buttons[1].click();
+            }, 100);
+        }
+    </script>
 </body>
 </html>

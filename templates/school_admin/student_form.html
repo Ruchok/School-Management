@@ -12,27 +12,32 @@
             </div>
             <div class="card-body">
                 {% if form.non_field_errors %}
-                    {{ form.non_field_errors }}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
                 {% endif %}
 
-                <form method="POST">
+                <form method="POST" novalidate>
                     {% csrf_token %}
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">{{ form.first_name.label }}</label>
+                                <input type="text" class="form-control" name="first_name" value="{{ form.first_name.value|default:'' }}" required>
                                 {% if form.first_name.errors %}
-                                    {{ form.first_name }}
-                                    <div class="invalid-feedback" style="display: block;">{{ form.first_name.errors }}</div>
-                                {% else %}
-                                    {{ form.first_name }}
+                                    <div class="invalid-feedback d-block">{{ form.first_name.errors.0 }}</div>
                                 {% endif %}
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">{{ form.last_name.label }}</label>
-                                {{ form.last_name }}
+                                <input type="text" class="form-control" name="last_name" value="{{ form.last_name.value|default:'' }}" required>
+                                {% if form.last_name.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.last_name.errors.0 }}</div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -41,13 +46,19 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">{{ form.username.label }}</label>
-                                {{ form.username }}
+                                <input type="text" class="form-control" name="username" value="{{ form.username.value|default:'' }}" required>
+                                {% if form.username.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.username.errors.0 }}</div>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">{{ form.email.label }}</label>
-                                {{ form.email }}
+                                <input type="email" class="form-control" name="email" value="{{ form.email.value|default:'' }}">
+                                {% if form.email.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.email.errors.0 }}</div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -56,14 +67,20 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">{{ form.password.label }}</label>
-                                {{ form.password }}
+                                <input type="password" class="form-control" name="password">
                                 <small class="form-text text-muted">Leave blank to keep current password</small>
+                                {% if form.password.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.password.errors.0 }}</div>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">{{ form.roll_number.label }}</label>
-                                {{ form.roll_number }}
+                                <input type="text" class="form-control{% if form.non_field_errors %} is-invalid{% endif %}" name="roll_number" value="{{ form.roll_number.value|default:'' }}">
+                                {% if form.roll_number.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.roll_number.errors.0 }}</div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -72,13 +89,26 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">{{ form.classroom.label }}</label>
-                                {{ form.classroom }}
+                                <select class="form-control{% if form.non_field_errors %} is-invalid{% endif %}" name="classroom" required>
+                                    <option value="">-- Select Class --</option>
+                                    {% for choice_id, choice_label in form.classroom.field.choices %}
+                                        {% if choice_id %}
+                                            <option value="{{ choice_id }}" {% if form.classroom.value == choice_id|stringformat:"s" %}selected{% endif %}>{{ choice_label }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                                {% if form.classroom.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.classroom.errors.0 }}</div>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">{{ form.admission_date.label }}</label>
-                                {{ form.admission_date }}
+                                <input type="date" class="form-control" name="admission_date" value="{{ form.admission_date.value|default:'' }}">
+                                {% if form.admission_date.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.admission_date.errors.0 }}</div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -87,13 +117,19 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">{{ form.guardian_name.label }}</label>
-                                {{ form.guardian_name }}
+                                <input type="text" class="form-control" name="guardian_name" value="{{ form.guardian_name.value|default:'' }}">
+                                {% if form.guardian_name.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.guardian_name.errors.0 }}</div>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">{{ form.guardian_phone.label }}</label>
-                                {{ form.guardian_phone }}
+                                <input type="text" class="form-control" name="guardian_phone" value="{{ form.guardian_phone.value|default:'' }}">
+                                {% if form.guardian_phone.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.guardian_phone.errors.0 }}</div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>

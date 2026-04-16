@@ -4,6 +4,7 @@ from django.db import models
 
 class CustomUser(AbstractUser):
 	class Roles(models.TextChoices):
+		PRINCIPLE_ADMIN = "PRINCIPLE_ADMIN", "Principle Admin"
 		ADMIN = "ADMIN", "Admin"
 		TEACHER = "TEACHER", "Teacher"
 		STUDENT = "STUDENT", "Student"

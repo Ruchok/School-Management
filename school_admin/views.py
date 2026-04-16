@@ -15,10 +15,10 @@ from .forms import StudentForm, TeacherForm, FeePaymentForm, ClassRoutineForm
 
 
 class AdminAuthMixin:
-    """Mixin to check if user is authenticated as school admin"""
+    """Mixin to check if user is authenticated as school admin or principle admin"""
     
     def dispatch(self, request, *args, **kwargs):
-        if not request.session.get('school_admin_authenticated', False):
+        if not (request.session.get('school_admin_authenticated', False) or request.session.get('principle_admin_authenticated', False)):
             return redirect('school_admin:login')
         return super().dispatch(request, *args, **kwargs)
 
@@ -31,16 +31,24 @@ class AdminLoginView(View):
     template_name = 'school_admin/login.html'
     
     def get(self, request):
-        if request.session.get('school_admin_authenticated', False):
+        if request.session.get('school_admin_authenticated', False) or request.session.get('principle_admin_authenticated', False):
             return redirect('school_admin:dashboard')
         return render(request, self.template_name)
     
     def post(self, request):
         password = request.POST.get('password', '')
         admin_password = getattr(settings, 'SCHOOL_ADMIN_PASSWORD', 'Admin@123')
+        principle_password = getattr(settings, 'PRINCIPLE_ADMIN_PASSWORD', 'Principle@Admin123')
         
-        if password == admin_password:
+        if password == principle_password:
+            request.session['principle_admin_authenticated'] = True
+            request.session['principle_admin'] = True
+            request.session.set_expiry(3600)  # 1 hour expiry
+            messages.success(request, 'Welcome Principle Admin! You have full access to the system.')
+            return redirect('school_admin:dashboard')
+        elif password == admin_password:
             request.session['school_admin_authenticated'] = True
+            request.session['principle_admin'] = False
             request.session.set_expiry(3600)  # 1 hour expiry
             messages.success(request, 'You have successfully logged in to the Admin Panel')
             return redirect('school_admin:dashboard')
@@ -55,6 +63,10 @@ class AdminLogoutView(View):
     def get(self, request):
         if 'school_admin_authenticated' in request.session:
             del request.session['school_admin_authenticated']
+        if 'principle_admin_authenticated' in request.session:
+            del request.session['principle_admin_authenticated']
+        if 'principle_admin' in request.session:
+            del request.session['principle_admin']
         messages.success(request, 'You have successfully logged out')
         return redirect('school_admin:login')
 
@@ -67,7 +79,11 @@ class AdminDashboardView(AdminAuthMixin, View):
     template_name = 'school_admin/dashboard.html'
     
     def get(self, request):
+        is_principle_admin = request.session.get('principle_admin_authenticated', False)
+        
         context = {
+            'is_principle_admin': is_principle_admin,
+            'admin_type': 'Principle Admin' if is_principle_admin else 'School Admin',
             'total_teachers': TeacherProfile.objects.count(),
             'total_students': StudentProfile.objects.count(),
             'total_classes': SchoolClass.objects.count(),
@@ -185,6 +201,36 @@ class AdminStudentDeleteView(AdminAuthMixin, View):
             messages.error(request, 'Student not found')
         
         return redirect('school_admin:students_list')
+
+
+class AdminStudentSearchView(AdminAuthMixin, View):
+    """Search students by name and show their routine"""
+    
+    template_name = 'school_admin/student_search.html'
+    
+    def get(self, request):
+        query = request.GET.get('q', '')
+        results = []
+        
+        if query:
+            results = StudentProfile.objects.select_related('user', 'classroom').filter(
+                Q(user__first_name__icontains=query) |
+                Q(user__last_name__icontains=query) |
+                Q(user__username__icontains=query) |
+                Q(roll_number__icontains=query)
+            ).order_by('user__first_name', 'user__last_name')
+            
+            # Add routine information to each student
+            for student in results:
+                student.routine = ClassRoutine.objects.filter(
+                    classroom=student.classroom
+                ).select_related('subject', 'teacher__user').order_by('day_of_week', 'start_time')
+        
+        return render(request, self.template_name, {
+            'query': query,
+            'results': results,
+            'count': results.count()
+        })
 
 
 # ===== TEACHER MANAGEMENT VIEWS =====

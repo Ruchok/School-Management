@@ -1,6 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Q, Sum
 from django.views.generic import RedirectView, TemplateView
+from django.contrib.auth import authenticate, login
+from django.views import View
+from django.shortcuts import render, redirect
+from django.contrib import messages
 
 from academics.models import SchoolClass, StudentProfile, Subject, TeacherProfile
 from attendance.models import AttendanceRecord
@@ -14,6 +18,32 @@ class HomeRedirectView(RedirectView):
 		if self.request.user.is_authenticated:
 			return "/dashboard/"
 		return "/login/"
+
+
+class LoginView(View):
+	"""Custom login view for CustomUser model"""
+	template_name = 'auth/login.html'
+	
+	def get(self, request):
+		if request.user.is_authenticated:
+			return redirect('dashboard')
+		return render(request, self.template_name)
+	
+	def post(self, request):
+		username = request.POST.get('username')
+		password = request.POST.get('password')
+		
+		user = authenticate(request, username=username, password=password)
+		
+		if user is not None:
+			login(request, user)
+			messages.success(request, f'Welcome back, {user.first_name or user.username}!')
+			return redirect('dashboard')
+		else:
+			messages.error(request, 'Invalid username or password. Please try again.')
+			return render(request, self.template_name, {
+				'username': username,
+			})
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):

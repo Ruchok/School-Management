@@ -11,19 +11,33 @@
                 <h5><i class="fas fa-chalkboard-user"></i> {{ title }}</h5>
             </div>
             <div class="card-body">
-                <form method="POST">
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <form method="POST" novalidate>
                     {% csrf_token %}
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">{{ form.first_name.label }}</label>
-                                {{ form.first_name }}
+                                <input type="text" class="form-control" name="first_name" value="{{ form.first_name.value|default:'' }}" required>
+                                {% if form.first_name.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.first_name.errors.0 }}</div>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">{{ form.last_name.label }}</label>
-                                {{ form.last_name }}
+                                <input type="text" class="form-control" name="last_name" value="{{ form.last_name.value|default:'' }}" required>
+                                {% if form.last_name.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.last_name.errors.0 }}</div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -32,13 +46,19 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">{{ form.username.label }}</label>
-                                {{ form.username }}
+                                <input type="text" class="form-control" name="username" value="{{ form.username.value|default:'' }}" required>
+                                {% if form.username.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.username.errors.0 }}</div>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">{{ form.email.label }}</label>
-                                {{ form.email }}
+                                <input type="email" class="form-control" name="email" value="{{ form.email.value|default:'' }}">
+                                {% if form.email.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.email.errors.0 }}</div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -47,14 +67,20 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">{{ form.phone.label }}</label>
-                                {{ form.phone }}
+                                <input type="text" class="form-control" name="phone" value="{{ form.phone.value|default:'' }}">
+                                {% if form.phone.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.phone.errors.0 }}</div>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">{{ form.password.label }}</label>
-                                {{ form.password }}
+                                <input type="password" class="form-control" name="password">
                                 <small class="form-text text-muted">Leave blank to keep current password</small>
+                                {% if form.password.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.password.errors.0 }}</div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -63,13 +89,19 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">{{ form.qualification.label }}</label>
-                                {{ form.qualification }}
+                                <input type="text" class="form-control" name="qualification" value="{{ form.qualification.value|default:'' }}">
+                                {% if form.qualification.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.qualification.errors.0 }}</div>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">{{ form.specialization.label }}</label>
-                                {{ form.specialization }}
+                                <input type="text" class="form-control" name="specialization" value="{{ form.specialization.value|default:'' }}">
+                                {% if form.specialization.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.specialization.errors.0 }}</div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -78,7 +110,10 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">{{ form.joined_on.label }}</label>
-                                {{ form.joined_on }}
+                                <input type="date" class="form-control" name="joined_on" value="{{ form.joined_on.value|default:'' }}">
+                                {% if form.joined_on.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.joined_on.errors.0 }}</div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>

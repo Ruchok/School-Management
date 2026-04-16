@@ -58,6 +58,35 @@
             font-weight: 600;
         }
 
+        .admin-type-badge {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .admin-type-badge i {
+            margin-right: 6px;
+            font-size: 14px;
+        }
+
+        .admin-type-badge.principle {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .admin-type-badge.school {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
         .sidebar-menu {
             list-style: none;
         }
@@ -87,6 +116,17 @@
             color: #4facfe;
             border-left-color: #4facfe;
             padding-left: 25px;
+        }
+
+        .sidebar-menu a i {
+            width: 20px;
+            text-align: center;
+            margin-right: 10px;
+        }
+
+        .sidebar-menu a.admin-type-indicator {
+            pointer-events: none;
+            cursor: default;
         }
 
         .menu-group-title {
@@ -373,14 +413,31 @@
         <div class="admin-sidebar">
             <div class="sidebar-header">
                 <h5><i class="fas fa-shield-alt"></i> Admin Panel</h5>
+                {% if is_principle_admin %}
+                    <div class="admin-type-badge principle">
+                        <i class="fas fa-crown"></i> Principle Admin
+                    </div>
+                {% else %}
+                    <div class="admin-type-badge school">
+                        <i class="fas fa-user-tie"></i> School Admin
+                    </div>
+                {% endif %}
             </div>
             
             <ul class="sidebar-menu">
                 <li class="menu-group-title">Main</li>
                 <li><a href="{% url 'school_admin:dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                 
+                <li class="menu-group-title">Admin Type</li>
+                {% if is_principle_admin %}
+                    <li><a class="admin-type-indicator" style="background: rgba(76, 175, 80, 0.2); color: #4caf50; border-left-color: #4caf50;"><i class="fas fa-crown"></i> Principle Admin</a></li>
+                {% else %}
+                    <li><a class="admin-type-indicator" style="background: rgba(76, 175, 80, 0.2); color: #4caf50; border-left-color: #4caf50;"><i class="fas fa-user-tie"></i> School Admin</a></li>
+                {% endif %}
+                
                 <li class="menu-group-title">Management</li>
-                <li><a href="{% url 'school_admin:students_list' %}" class="{% if 'student' in request.resolver_match.url_name %}active{% endif %}"><i class="fas fa-user-graduate"></i> Students</a></li>
+                <li><a href="{% url 'school_admin:students_list' %}" class="{% if request.resolver_match.url_name == 'students_list' %}active{% endif %}"><i class="fas fa-user-graduate"></i> Students</a></li>
+                <li><a href="{% url 'school_admin:student_search' %}" class="{% if request.resolver_match.url_name == 'student_search' %}active{% endif %}"><i class="fas fa-search"></i> Search Student</a></li>
                 <li><a href="{% url 'school_admin:teachers_list' %}" class="{% if 'teacher' in request.resolver_match.url_name %}active{% endif %}"><i class="fas fa-chalkboard-user"></i> Teachers</a></li>
                 <li><a href="{% url 'school_admin:payments_list' %}" class="{% if 'payment' in request.resolver_match.url_name %}active{% endif %}"><i class="fas fa-money-bill-wave"></i> Payments</a></li>
                 <li><a href="{% url 'school_admin:routines_list' %}" class="{% if 'routine' in request.resolver_match.url_name %}active{% endif %}"><i class="fas fa-calendar-alt"></i> Routines</a></li>
@@ -398,7 +455,11 @@
             <div class="admin-topbar">
                 <h2>{% block page_title %}Dashboard{% endblock %}</h2>
                 <div class="user-info">
-                    <span><i class="fas fa-user-shield"></i> Admin</span>
+                    {% if is_principle_admin %}
+                        <span><i class="fas fa-crown" style="color: #4caf50;"></i> Principle Admin</span>
+                    {% else %}
+                        <span><i class="fas fa-user-tie" style="color: #4caf50;"></i> School Admin</span>
+                    {% endif %}
                     <form method="GET" action="{% url 'school_admin:logout' %}" style="margin: 0;">
                         <button type="submit" class="btn-logout">Logout</button>
                     </form>

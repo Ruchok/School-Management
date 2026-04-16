@@ -2,19 +2,65 @@
 {% block title %}Students | EduPulse{% endblock %}
 {% block page_heading %}Students{% endblock %}
 {% block content %}
-<div class="dual">
-    <div class="card">
-        <h3>Admit Student</h3>
-        <form method="post">{% csrf_token %}{{ form.as_p }}<button class="btn" type="submit">Create Student</button></form>
-    </div>
-    <div class="card">
-        <h3>Student List</h3>
-        <div class="table-wrap">
-            <table>
-                <thead><tr><th>Roll</th><th>Name</th><th>Class</th><th>Guardian</th></tr></thead>
-                <tbody>{% for s in students %}<tr><td>{{ s.roll_number }}</td><td>{{ s.user.get_full_name }}</td><td>{{ s.classroom }}</td><td>{{ s.guardian_name }}</td></tr>{% empty %}<tr><td colspan="4">No students yet.</td></tr>{% endfor %}</tbody>
-            </table>
+<div class="card" style="margin-bottom: 24px;">
+    <h3>🔍 Search Students</h3>
+    <form method="get" action="{% url 'academics:search' %}" class="search-form">
+        <div class="search-input-group">
+            <input 
+                type="text" 
+                name="q" 
+                placeholder="Enter student name, email, roll number, or class..."
+                class="search-input"
+            />
+            <button type="submit" class="search-btn">Search</button>
         </div>
-    </div>
+    </form>
 </div>
+
+<style>
+.search-form {
+    display: grid;
+    gap: 12px;
+}
+
+.search-input-group {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+}
+
+.search-input {
+    padding: 14px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 15px;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #0f9d7a;
+    box-shadow: 0 0 0 3px rgba(15, 157, 122, 0.1);
+}
+
+.search-btn {
+    background: linear-gradient(135deg, #0f9d7a, #08735a);
+    color: white;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.search-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(15, 157, 122, 0.3);
+}
+</style>
 {% endblock %}
