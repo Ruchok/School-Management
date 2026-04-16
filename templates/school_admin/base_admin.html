@@ -76,9 +76,9 @@
         }
 
         .admin-type-badge.principle {
-            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
             color: white;
-            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
         }
 
         .admin-type-badge.school {
@@ -430,7 +430,7 @@
                 
                 <li class="menu-group-title">Admin Type</li>
                 {% if is_principle_admin %}
-                    <li><a class="admin-type-indicator" style="background: rgba(76, 175, 80, 0.2); color: #4caf50; border-left-color: #4caf50;"><i class="fas fa-crown"></i> Principle Admin</a></li>
+                    <li><a class="admin-type-indicator" style="background: rgba(255, 193, 7, 0.2); color: #ffc107; border-left-color: #ffc107;"><i class="fas fa-crown"></i> Principle Admin</a></li>
                 {% else %}
                     <li><a class="admin-type-indicator" style="background: rgba(76, 175, 80, 0.2); color: #4caf50; border-left-color: #4caf50;"><i class="fas fa-user-tie"></i> School Admin</a></li>
                 {% endif %}
@@ -456,9 +456,9 @@
                 <h2>{% block page_title %}Dashboard{% endblock %}</h2>
                 <div class="user-info">
                     {% if is_principle_admin %}
-                        <span><i class="fas fa-crown" style="color: #4caf50;"></i> Principle Admin</span>
+                        <span style="background: rgba(255, 193, 7, 0.2); padding: 8px 16px; border-radius: 20px; color: #ffc107; font-weight: 600;"><i class="fas fa-crown"></i> Principle Admin</span>
                     {% else %}
-                        <span><i class="fas fa-user-tie" style="color: #4caf50;"></i> School Admin</span>
+                        <span style="background: rgba(76, 175, 80, 0.2); padding: 8px 16px; border-radius: 20px; color: #4caf50; font-weight: 600;"><i class="fas fa-user-tie"></i> School Admin</span>
                     {% endif %}
                     <form method="GET" action="{% url 'school_admin:logout' %}" style="margin: 0;">
                         <button type="submit" class="btn-logout">Logout</button>
