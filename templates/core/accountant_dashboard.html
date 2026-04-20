@@ -9,7 +9,7 @@
     <div class="row mb-4">
         <div class="col-12">
             <h1 class="h3 mb-2">Finance Dashboard</h1>
-            <p class="text-muted">Welcome, {{ user.get_full_name|default:user.username }}! Manage school finances and fee collections.</p>
+            <p class="text-muted">Welcome, {% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.username }}{% endif %}! Manage school finances and fee collections.</p>
         </div>
     </div>
 

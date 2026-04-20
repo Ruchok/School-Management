@@ -58,6 +58,7 @@
                                 <a href="{% url 'school_admin:student_edit' student.id %}" class="btn btn-sm btn-warning">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
+                                {% if is_principle_admin %}
                                 <form method="POST" action="{% url 'school_admin:student_delete' %}" style="display: inline;" onsubmit="return confirm('Are you sure?');">
                                     {% csrf_token %}
                                     <input type="hidden" name="student_id" value="{{ student.id }}">
@@ -65,6 +66,7 @@
                                         <i class="fas fa-trash"></i> Delete
                                     </button>
                                 </form>
+                                {% endif %}
                             </td>
                         </tr>
                         {% endfor %}

@@ -133,12 +133,14 @@ class AdminStudentsListView(AdminAuthMixin, View):
             students = students.filter(classroom_id=classroom_filter)
         
         classrooms = SchoolClass.objects.all()
+        is_principle_admin = request.session.get('principle_admin_authenticated', False)
         
         return render(request, self.template_name, {
             'students': students.order_by('-admission_date'),
             'classrooms': classrooms,
             'search': search,
             'classroom_filter': classroom_filter,
+            'is_principle_admin': is_principle_admin,
         })
 
 
@@ -148,16 +150,18 @@ class AdminStudentCreateView(AdminAuthMixin, View):
     template_name = 'school_admin/student_form.html'
     
     def get(self, request):
+        is_principle_admin = request.session.get('principle_admin_authenticated', False)
         form = StudentForm()
-        return render(request, self.template_name, {'form': form, 'title': 'Add New Student'})
+        return render(request, self.template_name, {'form': form, 'title': 'Add New Student', 'is_principle_admin': is_principle_admin})
     
     def post(self, request):
+        is_principle_admin = request.session.get('principle_admin_authenticated', False)
         form = StudentForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, 'Student has been successfully added')
             return redirect('school_admin:students_list')
-        return render(request, self.template_name, {'form': form, 'title': 'Add New Student'})
+        return render(request, self.template_name, {'form': form, 'title': 'Add New Student', 'is_principle_admin': is_principle_admin})
 
 
 class AdminStudentEditView(AdminAuthMixin, View):
@@ -166,6 +170,7 @@ class AdminStudentEditView(AdminAuthMixin, View):
     template_name = 'school_admin/student_form.html'
     
     def get(self, request, pk):
+        is_principle_admin = request.session.get('principle_admin_authenticated', False)
         student = get_object_or_404(StudentProfile, pk=pk)
         form = StudentForm(instance=student, initial={
             'first_name': student.user.first_name,
@@ -173,22 +178,30 @@ class AdminStudentEditView(AdminAuthMixin, View):
             'username': student.user.username,
             'email': student.user.email,
         })
-        return render(request, self.template_name, {'form': form, 'title': f'Edit {student.user.get_full_name()}', 'student': student})
+        return render(request, self.template_name, {'form': form, 'title': f'Edit {student.user.get_full_name()}', 'student': student, 'is_principle_admin': is_principle_admin})
     
     def post(self, request, pk):
+        is_principle_admin = request.session.get('principle_admin_authenticated', False)
         student = get_object_or_404(StudentProfile, pk=pk)
         form = StudentForm(request.POST, instance=student)
         if form.is_valid():
             form.save()
             messages.success(request, 'Student has been successfully updated')
             return redirect('school_admin:students_list')
-        return render(request, self.template_name, {'form': form, 'title': f'Edit {student.user.get_full_name()}', 'student': student})
+        return render(request, self.template_name, {'form': form, 'title': f'Edit {student.user.get_full_name()}', 'student': student, 'is_principle_admin': is_principle_admin})
 
 
 class AdminStudentDeleteView(AdminAuthMixin, View):
-    """Delete a student"""
+    """Delete a student - Only Principle Admin can delete"""
     
     def post(self, request):
+        # Check if user is Principle Admin
+        is_principle_admin = request.session.get('principle_admin_authenticated', False)
+        
+        if not is_principle_admin:
+            messages.error(request, 'Only Principle Admin can delete students.')
+            return redirect('school_admin:students_list')
+        
         student_id = request.POST.get('student_id')
         try:
             student = StudentProfile.objects.get(id=student_id)
@@ -209,6 +222,7 @@ class AdminStudentSearchView(AdminAuthMixin, View):
     template_name = 'school_admin/student_search.html'
     
     def get(self, request):
+        is_principle_admin = request.session.get('principle_admin_authenticated', False)
         query = request.GET.get('q', '')
         results = []
         
@@ -229,7 +243,8 @@ class AdminStudentSearchView(AdminAuthMixin, View):
         return render(request, self.template_name, {
             'query': query,
             'results': results,
-            'count': results.count()
+            'count': results.count(),
+            'is_principle_admin': is_principle_admin
         })
 
 
@@ -254,9 +269,12 @@ class AdminTeachersListView(AdminAuthMixin, View):
                 Q(specialization__icontains=search)
             )
         
+        is_principle_admin = request.session.get('principle_admin_authenticated', False)
+        
         return render(request, self.template_name, {
             'teachers': teachers.order_by('-joined_on'),
             'search': search,
+            'is_principle_admin': is_principle_admin,
         })
 
 
@@ -266,16 +284,18 @@ class AdminTeacherCreateView(AdminAuthMixin, View):
     template_name = 'school_admin/teacher_form.html'
     
     def get(self, request):
+        is_principle_admin = request.session.get('principle_admin_authenticated', False)
         form = TeacherForm()
-        return render(request, self.template_name, {'form': form, 'title': 'Add New Teacher'})
+        return render(request, self.template_name, {'form': form, 'title': 'Add New Teacher', 'is_principle_admin': is_principle_admin})
     
     def post(self, request):
+        is_principle_admin = request.session.get('principle_admin_authenticated', False)
         form = TeacherForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, 'Teacher has been successfully added')
             return redirect('school_admin:teachers_list')
-        return render(request, self.template_name, {'form': form, 'title': 'Add New Teacher'})
+        return render(request, self.template_name, {'form': form, 'title': 'Add New Teacher', 'is_principle_admin': is_principle_admin})
 
 
 class AdminTeacherEditView(AdminAuthMixin, View):
@@ -284,6 +304,7 @@ class AdminTeacherEditView(AdminAuthMixin, View):
     template_name = 'school_admin/teacher_form.html'
     
     def get(self, request, pk):
+        is_principle_admin = request.session.get('principle_admin_authenticated', False)
         teacher = get_object_or_404(TeacherProfile, pk=pk)
         form = TeacherForm(instance=teacher, initial={
             'first_name': teacher.user.first_name,
@@ -292,22 +313,30 @@ class AdminTeacherEditView(AdminAuthMixin, View):
             'email': teacher.user.email,
             'phone': getattr(teacher.user, 'phone', ''),
         })
-        return render(request, self.template_name, {'form': form, 'title': f'Edit {teacher.user.get_full_name()}', 'teacher': teacher})
+        return render(request, self.template_name, {'form': form, 'title': f'Edit {teacher.user.get_full_name()}', 'teacher': teacher, 'is_principle_admin': is_principle_admin})
     
     def post(self, request, pk):
+        is_principle_admin = request.session.get('principle_admin_authenticated', False)
         teacher = get_object_or_404(TeacherProfile, pk=pk)
         form = TeacherForm(request.POST, instance=teacher)
         if form.is_valid():
             form.save()
             messages.success(request, 'Teacher has been successfully updated')
             return redirect('school_admin:teachers_list')
-        return render(request, self.template_name, {'form': form, 'title': f'Edit {teacher.user.get_full_name()}', 'teacher': teacher})
+        return render(request, self.template_name, {'form': form, 'title': f'Edit {teacher.user.get_full_name()}', 'teacher': teacher, 'is_principle_admin': is_principle_admin})
 
 
 class AdminTeacherDeleteView(AdminAuthMixin, View):
-    """Delete a teacher"""
+    """Delete a teacher - Only Principle Admin can delete"""
     
     def post(self, request):
+        # Check if user is Principle Admin
+        is_principle_admin = request.session.get('principle_admin_authenticated', False)
+        
+        if not is_principle_admin:
+            messages.error(request, 'Only Principle Admin can delete teachers.')
+            return redirect('school_admin:teachers_list')
+        
         teacher_id = request.POST.get('teacher_id')
         try:
             teacher = TeacherProfile.objects.get(id=teacher_id)
@@ -330,6 +359,7 @@ class AdminPaymentsListView(AdminAuthMixin, View):
     template_name = 'school_admin/payments_list.html'
     
     def get(self, request):
+        is_principle_admin = request.session.get('principle_admin_authenticated', False)
         search = request.GET.get('search', '')
         status_filter = request.GET.get('status', '')
         
@@ -352,6 +382,7 @@ class AdminPaymentsListView(AdminAuthMixin, View):
             'search': search,
             'status_filter': status_filter,
             'statuses': ['PENDING', 'PARTIAL', 'PAID'],
+            'is_principle_admin': is_principle_admin,
         }
         
         return render(request, self.template_name, context)
@@ -363,10 +394,12 @@ class AdminPaymentCreateView(AdminAuthMixin, View):
     template_name = 'school_admin/payment_form.html'
     
     def get(self, request):
+        is_principle_admin = request.session.get('principle_admin_authenticated', False)
         form = FeePaymentForm()
-        return render(request, self.template_name, {'form': form, 'title': 'Record New Payment'})
+        return render(request, self.template_name, {'form': form, 'title': 'Record New Payment', 'is_principle_admin': is_principle_admin})
     
     def post(self, request):
+        is_principle_admin = request.session.get('principle_admin_authenticated', False)
         form = FeePaymentForm(request.POST)
         if form.is_valid():
             payment = form.save(commit=False)
@@ -380,7 +413,7 @@ class AdminPaymentCreateView(AdminAuthMixin, View):
             
             messages.success(request, f'Payment of {payment.amount} has been recorded successfully')
             return redirect('school_admin:payments_list')
-        return render(request, self.template_name, {'form': form, 'title': 'Record New Payment'})
+        return render(request, self.template_name, {'form': form, 'title': 'Record New Payment', 'is_principle_admin': is_principle_admin})
 
 
 # ===== ROUTINE MANAGEMENT VIEWS =====
@@ -391,6 +424,7 @@ class AdminRoutinesListView(AdminAuthMixin, View):
     template_name = 'school_admin/routines_list.html'
     
     def get(self, request):
+        is_principle_admin = request.session.get('principle_admin_authenticated', False)
         classroom_filter = request.GET.get('classroom', '')
         day_filter = request.GET.get('day', '')
         
@@ -419,6 +453,7 @@ class AdminRoutinesListView(AdminAuthMixin, View):
             'days': days,
             'classroom_filter': classroom_filter,
             'day_filter': day_filter,
+            'is_principle_admin': is_principle_admin,
         })
 
 
@@ -428,16 +463,18 @@ class AdminRoutineCreateView(AdminAuthMixin, View):
     template_name = 'school_admin/routine_form.html'
     
     def get(self, request):
+        is_principle_admin = request.session.get('principle_admin_authenticated', False)
         form = ClassRoutineForm()
-        return render(request, self.template_name, {'form': form, 'title': 'Add New Class Schedule'})
+        return render(request, self.template_name, {'form': form, 'title': 'Add New Class Schedule', 'is_principle_admin': is_principle_admin})
     
     def post(self, request):
+        is_principle_admin = request.session.get('principle_admin_authenticated', False)
         form = ClassRoutineForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, 'Class schedule has been successfully added')
             return redirect('school_admin:routines_list')
-        return render(request, self.template_name, {'form': form, 'title': 'Add New Class Schedule'})
+        return render(request, self.template_name, {'form': form, 'title': 'Add New Class Schedule', 'is_principle_admin': is_principle_admin})
 
 
 class AdminRoutineEditView(AdminAuthMixin, View):
@@ -446,18 +483,20 @@ class AdminRoutineEditView(AdminAuthMixin, View):
     template_name = 'school_admin/routine_form.html'
     
     def get(self, request, pk):
+        is_principle_admin = request.session.get('principle_admin_authenticated', False)
         routine = get_object_or_404(ClassRoutine, pk=pk)
         form = ClassRoutineForm(instance=routine)
-        return render(request, self.template_name, {'form': form, 'title': f'Edit {routine.classroom} Schedule', 'routine': routine})
+        return render(request, self.template_name, {'form': form, 'title': f'Edit {routine.classroom} Schedule', 'routine': routine, 'is_principle_admin': is_principle_admin})
     
     def post(self, request, pk):
+        is_principle_admin = request.session.get('principle_admin_authenticated', False)
         routine = get_object_or_404(ClassRoutine, pk=pk)
         form = ClassRoutineForm(request.POST, instance=routine)
         if form.is_valid():
             form.save()
             messages.success(request, 'Class schedule has been successfully updated')
             return redirect('school_admin:routines_list')
-        return render(request, self.template_name, {'form': form, 'title': f'Edit {routine.classroom} Schedule', 'routine': routine})
+        return render(request, self.template_name, {'form': form, 'title': f'Edit {routine.classroom} Schedule', 'routine': routine, 'is_principle_admin': is_principle_admin})
 
 
 class AdminRoutineDeleteView(AdminAuthMixin, View):
@@ -485,10 +524,12 @@ class AdminUsersView(AdminAuthMixin, View):
     template_name = 'school_admin/users.html'
     
     def get(self, request):
+        is_principle_admin = request.session.get('principle_admin_authenticated', False)
         users = CustomUser.objects.all().order_by('-date_joined')
-        return render(request, self.template_name, {'users': users})
+        return render(request, self.template_name, {'users': users, 'is_principle_admin': is_principle_admin})
     
     def post(self, request):
+        is_principle_admin = request.session.get('principle_admin_authenticated', False)
         action = request.POST.get('action')
         user_id = request.POST.get('user_id')
         

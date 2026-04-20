@@ -5,6 +5,7 @@ from django.contrib.auth import authenticate, login
 from django.views import View
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.middleware.csrf import get_token
 
 from academics.models import SchoolClass, StudentProfile, Subject, TeacherProfile
 from attendance.models import AttendanceRecord
@@ -27,7 +28,8 @@ class LoginView(View):
 	def get(self, request):
 		if request.user.is_authenticated:
 			return redirect('dashboard')
-		return render(request, self.template_name)
+		csrf_token = get_token(request)
+		return render(request, self.template_name, {'csrf_token': csrf_token})
 	
 	def post(self, request):
 		username = request.POST.get('username')
@@ -62,6 +64,9 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		user = self.request.user
+		
+		# Always include user in context
+		context['user'] = user
 
 		if user.role == "ADMIN":
 			context.update(self._admin_context())
@@ -72,11 +77,15 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 		elif user.role == "ACCOUNTANT":
 			context.update(self._accountant_context())
 
+		# Ensure user is always in context (in case context.update overwrote it)
+		context['user'] = user
+		
 		return context
 
 	def _admin_context(self):
 		"""Admin dashboard shows overall system statistics"""
 		return {
+			"user": self.request.user,
 			"stats": {
 				"students": StudentProfile.objects.count(),
 				"teachers": CustomUser.objects.filter(role="TEACHER").count(),
@@ -121,6 +130,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 		exams = Exam.objects.filter(classroom__in=managed_classes).order_by("-exam_date")[:5]
 
 		return {
+			"user": user,
 			"teacher_profile": teacher_profile,
 			"managed_classes": managed_classes,
 			"subjects": subjects,
@@ -142,6 +152,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 		except StudentProfile.DoesNotExist:
 			return {
 				"message": "Your student profile is not set up yet. Please contact administration.",
+				"user": user,
 			}
 
 		classroom = student_profile.classroom
@@ -173,6 +184,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 		total_paid = invoices.aggregate(Sum("amount_paid"))["amount_paid__sum"] or 0
 
 		return {
+			"user": user,
 			"student_profile": student_profile,
 			"classroom": classroom,
 			"subjects": subjects,
@@ -205,6 +217,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 		invoice_status_breakdown = invoices.values("status").annotate(count=Count("id"))
 
 		return {
+			"user": self.request.user,
 			"stats": {
 				"total_invoices": invoices.count(),
 				"pending_invoices": invoices.filter(status="PENDING").count(),
