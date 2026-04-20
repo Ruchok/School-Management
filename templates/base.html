@@ -7,7 +7,7 @@
     <title>{% block title %}School Management{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <!-- AG Grid CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.3.0/dist/styles/ag-grid.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.3.0/dist/styles/ag-theme-quartz.css">
@@ -26,56 +26,150 @@
     </style>
 </head>
 <body class="{% if not user.is_authenticated %}auth-wallpaper{% endif %}">
-<div class="bg-shape bg-shape-a"></div>
-<div class="bg-shape bg-shape-b"></div>
+
+{% if user.is_authenticated %}
+<!-- Mobile overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+{% endif %}
+
 <div class="layout {% if not user.is_authenticated %}layout-auth{% endif %}">
     {% if user.is_authenticated %}
-    <aside class="sidebar">
-        <h1>JJKM GVT SCHOOL AND COLLEGE</h1>
-        <p class="subtitle">School Management</p>
-        <nav>
-            <a href="{% url 'dashboard' %}">Dashboard</a>
-            <a href="{% url 'academics:classes' %}">Classes</a>
-            <a href="{% url 'academics:subjects' %}">Subjects</a>
-            <a href="{% url 'academics:students' %}">Students</a>
-            <a href="{% url 'academics:teachers' %}">Teachers</a>
-            <a href="{% url 'attendance:list' %}">Attendance</a>
-            <a href="{% url 'exams:list' %}">Exams</a>
-            <a href="{% url 'exams:results' %}">Results</a>
-            <a href="{% url 'finance:structures' %}">Fee Structures</a>
-            <a href="{% url 'finance:invoices' %}">Invoices</a>
-            <a href="{% url 'finance:payments' %}">Payments</a>
-            <hr style="margin: 15px 0; border: none; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-            <a href="{% url 'school_admin:login' %}" style="color: #ff6b6b; font-weight: 500;">🛡️ School Admin</a>
-            <a href="{% url 'admin:index' %}">Django Admin</a>
+    <aside class="sidebar" id="sidebar">
+        <!-- Brand -->
+        <div class="sidebar-brand">
+            <div class="brand-icon">🏫</div>
+            <div class="brand-text">
+                <h1>JJKM School</h1>
+                <span class="brand-sub">Management System</span>
+            </div>
+        </div>
+        <div class="sidebar-badge">
+            <span>{{ user.get_full_name|default:user.username }}</span>
+        </div>
+
+        <!-- Nav Groups -->
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Main</div>
+            <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <span class="nav-icon">📊</span><span>Dashboard</span>
+            </a>
+
+            <div class="nav-section-label">Academics</div>
+            <a href="{% url 'academics:classes' %}" class="nav-link">
+                <span class="nav-icon">🏫</span><span>Classes</span>
+            </a>
+            <a href="{% url 'academics:subjects' %}" class="nav-link">
+                <span class="nav-icon">📖</span><span>Subjects</span>
+            </a>
+            <a href="{% url 'academics:students' %}" class="nav-link">
+                <span class="nav-icon">👩‍🎓</span><span>Students</span>
+            </a>
+            <a href="{% url 'academics:teachers' %}" class="nav-link">
+                <span class="nav-icon">👨‍🏫</span><span>Teachers</span>
+            </a>
+
+            <div class="nav-section-label">Records</div>
+            <a href="{% url 'attendance:list' %}" class="nav-link">
+                <span class="nav-icon">✅</span><span>Attendance</span>
+            </a>
+            <a href="{% url 'exams:list' %}" class="nav-link">
+                <span class="nav-icon">📝</span><span>Exams</span>
+            </a>
+            <a href="{% url 'exams:results' %}" class="nav-link">
+                <span class="nav-icon">📈</span><span>Results</span>
+            </a>
+
+            <div class="nav-section-label">Finance</div>
+            <a href="{% url 'finance:structures' %}" class="nav-link">
+                <span class="nav-icon">💳</span><span>Fee Structures</span>
+            </a>
+            <a href="{% url 'finance:invoices' %}" class="nav-link">
+                <span class="nav-icon">🧾</span><span>Invoices</span>
+            </a>
+            <a href="{% url 'finance:payments' %}" class="nav-link">
+                <span class="nav-icon">💰</span><span>Payments</span>
+            </a>
+
+            <div class="nav-section-label">System</div>
+            <a href="{% url 'school_admin:login' %}" class="nav-link nav-link-admin">
+                <span class="nav-icon">🛡️</span><span>School Admin</span>
+            </a>
+            <a href="{% url 'admin:index' %}" class="nav-link">
+                <span class="nav-icon">⚙️</span><span>Django Admin</span>
+            </a>
         </nav>
+
+        <!-- Sidebar Footer -->
+        <div class="sidebar-footer">
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="sidebar-logout-btn">
+                    <span>🚪</span> Logout
+                </button>
+            </form>
+        </div>
     </aside>
     {% endif %}
+
     <main class="content {% if not user.is_authenticated %}content-auth{% endif %}">
         {% if user.is_authenticated %}
         <header class="topbar">
-            <div>
-                <h2>{% block page_heading %}Overview{% endblock %}</h2>
-                <p>Welcome, {{ user.get_full_name|default:user.username }}</p>
+            <div class="topbar-left">
+                <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+                    <span></span><span></span><span></span>
+                </button>
+                <div class="topbar-heading">
+                    <h2>{% block page_heading %}Overview{% endblock %}</h2>
+                    <p>Welcome back, <strong>{{ user.get_full_name|default:user.username }}</strong></p>
+                </div>
             </div>
-            <form method="post" action="{% url 'logout' %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-outline">Logout</button>
-            </form>
+            <div class="topbar-right">
+                <div class="topbar-user">
+                    <div class="user-avatar">{{ user.get_full_name|default:user.username|first|upper }}</div>
+                    <span class="user-name">{{ user.get_full_name|default:user.username }}</span>
+                </div>
+            </div>
         </header>
         {% endif %}
 
-        {% if messages %}
-            {% for message in messages %}
-            <div class="alert">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
+        <div class="page-body">
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
 
-        {% block content %}{% endblock %}
+            {% block content %}{% endblock %}
+        </div>
     </main>
 </div>
+
 <!-- AG Grid Library -->
 <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@31.3.0/dist/ag-grid-community.min.js"></script>
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('active');
+    }
+    function closeSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+    }
+    // Mark active nav link
+    (function () {
+        const links = document.querySelectorAll('.nav-link');
+        const current = window.location.pathname;
+        links.forEach(link => {
+            if (link.getAttribute('href') === current) {
+                link.classList.add('active');
+            }
+        });
+    })();
+</script>
 {% block extra_scripts %}{% endblock %}
 </body>
 </html>
