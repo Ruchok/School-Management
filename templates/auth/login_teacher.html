@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
-{% block title %}{{ role_label|default:"Sign In" }} — School Management{% endblock %}
+{% block title %}Teacher Login — School Management{% endblock %}
 {% block content %}
 <div class="auth-center">
     <section class="school-hero">
-        <p class="school-tag">Welcome To</p>
+        <p class="school-tag">Teacher Portal</p>
         <h1>ISLAMPUR GVT.JJKM GIRLS HIGHSCHOOL AND COLLEGE</h1>
     </section>
     <div class="card">
-        <h2>{% if role_label %}{{ role_label }} Sign In{% else %}Sign In{% endif %}</h2>
-        <p class="subtitle">Enter your credentials to access your dashboard.</p>
+        <div class="login-role-badge login-role-teacher">👨‍🏫 Teacher Sign In</div>
+        <p class="subtitle">Manage your classes, students, and exams.</p>
 
         {% if messages %}
             {% for message in messages %}
@@ -20,18 +20,17 @@
             {% csrf_token %}
             <label for="id_username">Username</label>
             <input type="text" name="username" id="id_username" required autofocus
-                   value="{{ username|default:'' }}" placeholder="Enter your username">
+                   value="{{ username|default:'' }}" placeholder="Your teacher username">
             <label for="id_password">Password</label>
             <input type="password" name="password" id="id_password" required
-                   placeholder="Enter your password">
-            <button class="btn" type="submit" style="margin-top:4px;">Sign In</button>
+                   placeholder="Your password">
+            <button class="btn btn-teacher" type="submit" style="margin-top:4px;">Sign In as Teacher</button>
         </form>
 
         <div class="login-portals">
             <p>Other login portals:</p>
             <div class="portal-links">
                 <a href="{% url 'login_student' %}" class="portal-btn portal-student">Student</a>
-                <a href="{% url 'login_teacher' %}" class="portal-btn portal-teacher">Teacher</a>
                 <a href="{% url 'school_admin:login' %}" class="portal-btn portal-admin">Admin</a>
                 <a href="{% url 'login_accountant' %}" class="portal-btn portal-accountant">Accountant</a>
                 <a href="{% url 'school_admin:login' %}" class="portal-btn portal-superadmin">School Admin</a>

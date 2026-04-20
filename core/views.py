@@ -14,41 +14,123 @@ from finance.models import FeeInvoice, FeePayment
 from users.models import CustomUser
 
 
+def _role_home_url(user):
+	"""Return the appropriate home URL for an authenticated user's role."""
+	if user.role in ("ADMIN", "PRINCIPLE_ADMIN") or user.is_staff or user.is_superuser:
+		return "/school-admin/dashboard/"
+	return "/dashboard/"
+
+
 class HomeRedirectView(RedirectView):
 	def get_redirect_url(self, *args, **kwargs):
 		if self.request.user.is_authenticated:
-			return "/dashboard/"
+			return _role_home_url(self.request.user)
 		return "/login/"
 
 
-class LoginView(View):
-	"""Custom login view for CustomUser model"""
+# ---------------------------------------------------------------------------
+# Base role-gated login view
+# ---------------------------------------------------------------------------
+
+class _RoleLoginView(View):
+	"""Shared login logic; subclasses set `allowed_roles`, `template_name`,
+	and `role_label` for the context.
+	Set `allow_staff = True` only on portals that accept admin/staff accounts."""
+	allowed_roles = []
+	allow_staff = False       # staff/superusers are blocked by default
 	template_name = 'auth/login.html'
-	
+	role_label = 'User'
+
+	def _already_logged_in_redirect(self, request):
+		return redirect(_role_home_url(request.user))
+
 	def get(self, request):
 		if request.user.is_authenticated:
-			return redirect('dashboard')
-		csrf_token = get_token(request)
-		return render(request, self.template_name, {'csrf_token': csrf_token})
-	
+			return self._already_logged_in_redirect(request)
+		return render(request, self.template_name, {'role_label': self.role_label})
+
 	def post(self, request):
-		username = request.POST.get('username')
-		password = request.POST.get('password')
-		
+		username = request.POST.get('username', '').strip()
+		password = request.POST.get('password', '')
+
 		user = authenticate(request, username=username, password=password)
-		
-		if user is not None:
-			login(request, user)
-			messages.success(request, f'Welcome back, {user.first_name or user.username}!')
-			return redirect('dashboard')
-		else:
-			messages.error(request, 'Invalid username or password. Please try again.')
+
+		if user is None:
+			messages.error(request, 'Invalid username or password.')
 			return render(request, self.template_name, {
 				'username': username,
+				'role_label': self.role_label,
 			})
+
+		# Staff / superuser accounts must use the School Admin portal only
+		if not self.allow_staff and (user.is_staff or user.is_superuser):
+			messages.error(
+				request,
+				'Administrator accounts must use the School Admin portal at /school-admin/login/'
+			)
+			return render(request, self.template_name, {
+				'username': username,
+				'role_label': self.role_label,
+			})
+
+		# Role must exactly match the portal's allowed roles
+		if self.allowed_roles and user.role not in self.allowed_roles:
+			messages.error(
+				request,
+				f'This portal is for {self.role_label} accounts only. '
+				f'Your account role is "{user.get_role_display()}". '
+				f'Please use the correct login portal.'
+			)
+			return render(request, self.template_name, {
+				'username': username,
+				'role_label': self.role_label,
+			})
+
+		login(request, user)
+		messages.success(request, f'Welcome back, {user.first_name or user.username}!')
+		return redirect(_role_home_url(user))
+
+
+class LoginView(_RoleLoginView):
+	"""General fallback login — accepts any role but still blocks
+	staff/superusers and directs them to the correct portal."""
+	allowed_roles = []
+	allow_staff = False
+	template_name = 'auth/login.html'
+	role_label = 'User'
+
+
+class StudentLoginView(_RoleLoginView):
+	allowed_roles = [CustomUser.Roles.STUDENT]
+	template_name = 'auth/login_student.html'
+	role_label = 'Student'
+
+
+class TeacherLoginView(_RoleLoginView):
+	allowed_roles = [CustomUser.Roles.TEACHER]
+	template_name = 'auth/login_teacher.html'
+	role_label = 'Teacher'
+
+
+class AccountantLoginView(_RoleLoginView):
+	allowed_roles = [CustomUser.Roles.ACCOUNTANT]
+	template_name = 'auth/login_accountant.html'
+	role_label = 'Accountant'
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
+	login_url = '/login/'
+
+	def dispatch(self, request, *args, **kwargs):
+		# School admins / superusers belong in the school-admin panel, not here
+		if request.user.is_authenticated and (
+			request.user.role in ("ADMIN", "PRINCIPLE_ADMIN")
+			or request.user.is_staff
+			or request.user.is_superuser
+		):
+			return redirect('school_admin:dashboard')
+		return super().dispatch(request, *args, **kwargs)
+
 	def get_template_names(self):
 		user = self.request.user
 		if user.role == "ADMIN":

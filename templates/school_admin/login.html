@@ -215,10 +215,16 @@
 
             <form method="POST">
                 {% csrf_token %}
-                
+
                 <div class="form-group">
-                    <label class="form-label"><i class="fas fa-lock"></i> <span id="label-password">Admin Password</span></label>
-                    <input type="password" name="password" class="form-control" id="password-input" placeholder="Enter admin password" required autofocus>
+                    <label class="form-label"><i class="fas fa-user"></i> <span id="label-username">Username</span></label>
+                    <input type="text" name="username" class="form-control" id="username-input"
+                           placeholder="Enter your username" value="{{ username|default:'' }}" required autofocus>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-lock"></i> <span id="label-password">Password</span></label>
+                    <input type="password" name="password" class="form-control" id="password-input" placeholder="Enter your password" required>
                 </div>
 
                 <button type="submit" class="btn-login">
@@ -228,12 +234,16 @@
 
             <div class="security-note">
                 <i class="fas fa-info-circle"></i>
-                <strong id="security-title">Security Note:</strong> 
-                <span id="security-text">This panel is protected. Only authorized administrators can access it.</span>
+                <strong id="security-title">Access Levels:</strong>
+                <span id="security-text">Sign in with your admin account credentials.</span>
                 <div style="margin-top: 10px; font-size: 12px; opacity: 0.9;">
-                    <div id="admin-hint">• School Admin: Limited access to students and teachers</div>
-                    <div id="principle-hint">• Principle Admin: Full access to entire system</div>
+                    <div id="admin-hint">• School Admin (role=ADMIN): Manage students, teachers, routines</div>
+                    <div id="principle-hint">• Principle Admin (role=PRINCIPLE_ADMIN) / Superuser: Full system access</div>
                 </div>
+            </div>
+
+            <div style="text-align:center; margin-top:16px; font-size:13px;">
+                <a href="{% url 'login' %}" style="color:#667eea;">← Back to general login</a>
             </div>
 
             <div class="footer-text">

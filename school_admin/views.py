@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib import messages
-from django.conf import settings
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.db.models import Count, Q
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
@@ -13,12 +13,19 @@ from finance.models import FeePayment, FeeInvoice
 from .models import ClassRoutine
 from .forms import StudentForm, TeacherForm, FeePaymentForm, ClassRoutineForm
 
+_ADMIN_ROLES = {'ADMIN', 'PRINCIPLE_ADMIN'}
+
 
 class AdminAuthMixin:
-    """Mixin to check if user is authenticated as school admin or principle admin"""
-    
+    """Require Django-authenticated school admin / principle admin."""
+
     def dispatch(self, request, *args, **kwargs):
-        if not (request.session.get('school_admin_authenticated', False) or request.session.get('principle_admin_authenticated', False)):
+        if not request.user.is_authenticated:
+            return redirect('school_admin:login')
+        is_admin_role = request.user.role in _ADMIN_ROLES
+        is_staff = request.user.is_staff or request.user.is_superuser
+        if not (is_admin_role or is_staff):
+            messages.error(request, 'You do not have permission to access the admin panel.')
             return redirect('school_admin:login')
         return super().dispatch(request, *args, **kwargs)
 
@@ -26,48 +33,66 @@ class AdminAuthMixin:
 # ===== AUTHENTICATION VIEWS =====
 
 class AdminLoginView(View):
-    """Custom admin login with password"""
-    
+    """School admin login — authenticates via Django auth, then checks admin role."""
+
     template_name = 'school_admin/login.html'
-    
+
     def get(self, request):
-        if request.session.get('school_admin_authenticated', False) or request.session.get('principle_admin_authenticated', False):
+        if request.user.is_authenticated and (
+            request.user.role in _ADMIN_ROLES
+            or request.user.is_staff
+            or request.user.is_superuser
+        ):
             return redirect('school_admin:dashboard')
         return render(request, self.template_name)
-    
+
     def post(self, request):
+        username = request.POST.get('username', '').strip()
         password = request.POST.get('password', '')
-        admin_password = getattr(settings, 'SCHOOL_ADMIN_PASSWORD', 'Admin@123')
-        principle_password = getattr(settings, 'PRINCIPLE_ADMIN_PASSWORD', 'Principle@Admin123')
-        
-        if password == principle_password:
+
+        if not username or not password:
+            messages.error(request, 'Please enter both username and password.')
+            return render(request, self.template_name)
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is None:
+            messages.error(request, 'Invalid username or password.')
+            return render(request, self.template_name, {'username': username})
+
+        is_admin_role = user.role in _ADMIN_ROLES
+        is_staff = user.is_staff or user.is_superuser
+
+        if not (is_admin_role or is_staff):
+            messages.error(
+                request,
+                'This portal is for School Admin / Principle Admin only. '
+                f'Your account role is "{user.get_role_display()}".'
+            )
+            return render(request, self.template_name, {'username': username})
+
+        auth_login(request, user)
+        # Mark session so templates / legacy checks still work
+        request.session['school_admin_authenticated'] = True
+        if user.role == 'PRINCIPLE_ADMIN' or user.is_superuser:
             request.session['principle_admin_authenticated'] = True
             request.session['principle_admin'] = True
-            request.session.set_expiry(3600)  # 1 hour expiry
-            messages.success(request, 'Welcome Principle Admin! You have full access to the system.')
-            return redirect('school_admin:dashboard')
-        elif password == admin_password:
-            request.session['school_admin_authenticated'] = True
-            request.session['principle_admin'] = False
-            request.session.set_expiry(3600)  # 1 hour expiry
-            messages.success(request, 'You have successfully logged in to the Admin Panel')
-            return redirect('school_admin:dashboard')
+            messages.success(request, f'Welcome, Principle Admin {user.get_full_name() or user.username}!')
         else:
-            messages.error(request, 'Invalid password. Please try again.')
-            return render(request, self.template_name)
+            request.session['principle_admin_authenticated'] = False
+            request.session['principle_admin'] = False
+            messages.success(request, f'Welcome, {user.get_full_name() or user.username}!')
+        return redirect('school_admin:dashboard')
 
 
 class AdminLogoutView(View):
-    """Logout from admin panel"""
-    
+    """Logout from admin panel and clear session flags."""
+
     def get(self, request):
-        if 'school_admin_authenticated' in request.session:
-            del request.session['school_admin_authenticated']
-        if 'principle_admin_authenticated' in request.session:
-            del request.session['principle_admin_authenticated']
-        if 'principle_admin' in request.session:
-            del request.session['principle_admin']
-        messages.success(request, 'You have successfully logged out')
+        for key in ('school_admin_authenticated', 'principle_admin_authenticated', 'principle_admin'):
+            request.session.pop(key, None)
+        auth_logout(request)
+        messages.success(request, 'You have been logged out.')
         return redirect('school_admin:login')
 
 

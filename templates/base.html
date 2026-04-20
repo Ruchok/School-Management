@@ -44,7 +44,14 @@
             </div>
         </div>
         <div class="sidebar-badge">
-            <span>{{ user.get_full_name|default:user.username }}</span>
+            <span>
+                {% if user.role == "PRINCIPLE_ADMIN" or user.is_superuser %}🛡️ Principle Admin
+                {% elif user.role == "ADMIN" or user.is_staff %}🧑‍💼 Admin
+                {% elif user.role == "TEACHER" %}👨‍🏫 Teacher
+                {% elif user.role == "STUDENT" %}👩‍🎓 Student
+                {% elif user.role == "ACCOUNTANT" %}🧾 Accountant
+                {% else %}{{ user.get_full_name|default:user.username }}{% endif %}
+            </span>
         </div>
 
         <!-- Nav Groups -->
@@ -54,6 +61,8 @@
                 <span class="nav-icon">📊</span><span>Dashboard</span>
             </a>
 
+            {% if user.role == "ADMIN" or user.role == "PRINCIPLE_ADMIN" or user.is_staff or user.is_superuser %}
+            {# ── ADMIN / PRINCIPLE ADMIN NAV ── #}
             <div class="nav-section-label">Academics</div>
             <a href="{% url 'academics:classes' %}" class="nav-link">
                 <span class="nav-icon">🏫</span><span>Classes</span>
@@ -67,7 +76,46 @@
             <a href="{% url 'academics:teachers' %}" class="nav-link">
                 <span class="nav-icon">👨‍🏫</span><span>Teachers</span>
             </a>
+            <div class="nav-section-label">Records</div>
+            <a href="{% url 'attendance:list' %}" class="nav-link">
+                <span class="nav-icon">✅</span><span>Attendance</span>
+            </a>
+            <a href="{% url 'exams:list' %}" class="nav-link">
+                <span class="nav-icon">📝</span><span>Exams</span>
+            </a>
+            <a href="{% url 'exams:results' %}" class="nav-link">
+                <span class="nav-icon">📈</span><span>Results</span>
+            </a>
+            <div class="nav-section-label">Finance</div>
+            <a href="{% url 'finance:structures' %}" class="nav-link">
+                <span class="nav-icon">💳</span><span>Fee Structures</span>
+            </a>
+            <a href="{% url 'finance:invoices' %}" class="nav-link">
+                <span class="nav-icon">🧾</span><span>Invoices</span>
+            </a>
+            <a href="{% url 'finance:payments' %}" class="nav-link">
+                <span class="nav-icon">💰</span><span>Payments</span>
+            </a>
+            <div class="nav-section-label">System</div>
+            <a href="{% url 'school_admin:dashboard' %}" class="nav-link nav-link-admin">
+                <span class="nav-icon">🛡️</span><span>School Admin Panel</span>
+            </a>
+            <a href="{% url 'admin:index' %}" class="nav-link">
+                <span class="nav-icon">⚙️</span><span>Django Admin</span>
+            </a>
 
+            {% elif user.role == "TEACHER" %}
+            {# ── TEACHER NAV ── #}
+            <div class="nav-section-label">My Classes</div>
+            <a href="{% url 'academics:classes' %}" class="nav-link">
+                <span class="nav-icon">🏫</span><span>Classes</span>
+            </a>
+            <a href="{% url 'academics:subjects' %}" class="nav-link">
+                <span class="nav-icon">📖</span><span>Subjects</span>
+            </a>
+            <a href="{% url 'academics:students' %}" class="nav-link">
+                <span class="nav-icon">👩‍🎓</span><span>Students</span>
+            </a>
             <div class="nav-section-label">Records</div>
             <a href="{% url 'attendance:list' %}" class="nav-link">
                 <span class="nav-icon">✅</span><span>Attendance</span>
@@ -79,6 +127,31 @@
                 <span class="nav-icon">📈</span><span>Results</span>
             </a>
 
+            {% elif user.role == "STUDENT" %}
+            {# ── STUDENT NAV ── #}
+            <div class="nav-section-label">My Academics</div>
+            <a href="{% url 'academics:subjects' %}" class="nav-link">
+                <span class="nav-icon">📖</span><span>Subjects</span>
+            </a>
+            <a href="{% url 'attendance:list' %}" class="nav-link">
+                <span class="nav-icon">✅</span><span>My Attendance</span>
+            </a>
+            <a href="{% url 'exams:list' %}" class="nav-link">
+                <span class="nav-icon">📝</span><span>Exams</span>
+            </a>
+            <a href="{% url 'exams:results' %}" class="nav-link">
+                <span class="nav-icon">📈</span><span>My Results</span>
+            </a>
+            <div class="nav-section-label">Finance</div>
+            <a href="{% url 'finance:invoices' %}" class="nav-link">
+                <span class="nav-icon">🧾</span><span>My Invoices</span>
+            </a>
+            <a href="{% url 'finance:payments' %}" class="nav-link">
+                <span class="nav-icon">💰</span><span>My Payments</span>
+            </a>
+
+            {% elif user.role == "ACCOUNTANT" %}
+            {# ── ACCOUNTANT NAV ── #}
             <div class="nav-section-label">Finance</div>
             <a href="{% url 'finance:structures' %}" class="nav-link">
                 <span class="nav-icon">💳</span><span>Fee Structures</span>
@@ -89,14 +162,23 @@
             <a href="{% url 'finance:payments' %}" class="nav-link">
                 <span class="nav-icon">💰</span><span>Payments</span>
             </a>
+            <div class="nav-section-label">Reports</div>
+            <a href="{% url 'academics:students' %}" class="nav-link">
+                <span class="nav-icon">👩‍🎓</span><span>Students</span>
+            </a>
 
-            <div class="nav-section-label">System</div>
-            <a href="{% url 'school_admin:login' %}" class="nav-link nav-link-admin">
-                <span class="nav-icon">🛡️</span><span>School Admin</span>
+            {% else %}
+            {# ── FALLBACK NAV ── #}
+            <a href="{% url 'academics:classes' %}" class="nav-link">
+                <span class="nav-icon">🏫</span><span>Classes</span>
             </a>
-            <a href="{% url 'admin:index' %}" class="nav-link">
-                <span class="nav-icon">⚙️</span><span>Django Admin</span>
+            <a href="{% url 'academics:subjects' %}" class="nav-link">
+                <span class="nav-icon">📖</span><span>Subjects</span>
             </a>
+            <a href="{% url 'academics:students' %}" class="nav-link">
+                <span class="nav-icon">👩‍🎓</span><span>Students</span>
+            </a>
+            {% endif %}
         </nav>
 
         <!-- Sidebar Footer -->

@@ -272,7 +272,7 @@
                                         <td>{{ exam.exam_date|date:"d M, Y" }}</td>
                                         <td>{{ exam.total_marks }}</td>
                                         <td>
-                                            <a href="{% url 'exams:exams' %}" class="btn btn-sm btn-primary">View Results</a>
+                                            <a href="{% url 'exams:results' %}" class="btn btn-sm btn-primary">View Results</a>
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -295,7 +295,7 @@
                 </div>
                 <div class="card-body">
                     <a href="{% url 'attendance:list' %}" class="btn btn-outline-primary me-2">Mark Attendance</a>
-                    <a href="{% url 'exams:exams' %}" class="btn btn-outline-info me-2">View Exams</a>
+                    <a href="{% url 'exams:list' %}" class="btn btn-outline-info me-2">View Exams</a>
                     <a href="{% url 'academics:classes' %}" class="btn btn-outline-success me-2">View Classes</a>
                     <a href="{% url 'academics:students' %}" class="btn btn-outline-warning">View Students</a>
                 </div>

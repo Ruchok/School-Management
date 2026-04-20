@@ -675,3 +675,67 @@ input:focus, select:focus, textarea:focus {
 @media (max-width: 400px) {
     .grid { grid-template-columns: 1fr; }
 }
+
+/* ============================================================
+   ROLE LOGIN PORTALS
+   ============================================================ */
+.login-role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+.login-role-student  { background: #e6f7f1; color: #0d6e4f; border: 1.5px solid #a3d9c8; }
+.login-role-teacher  { background: #eff6ff; color: #1d4ed8; border: 1.5px solid #bfdbfe; }
+.login-role-admin    { background: #fef3c7; color: #92400e; border: 1.5px solid #fcd34d; }
+.login-role-accountant { background: #f5f3ff; color: #5b21b6; border: 1.5px solid #c4b5fd; }
+
+.btn-student    { background: #16a871; }
+.btn-student:hover { background: #0d8257; }
+.btn-teacher    { background: #2563eb; }
+.btn-teacher:hover { background: #1d4ed8; }
+.btn-admin      { background: #d97706; }
+.btn-admin:hover { background: #b45309; }
+.btn-accountant { background: #7c3aed; }
+.btn-accountant:hover { background: #6d28d9; }
+
+.login-portals {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+.login-portals p {
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0 0 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+}
+.portal-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.portal-btn {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1.5px solid transparent;
+    transition: var(--transition);
+}
+.portal-student    { background: #e6f7f1; color: #0d6e4f; border-color: #a3d9c8; }
+.portal-student:hover { background: #16a871; color: #fff; }
+.portal-teacher    { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+.portal-teacher:hover { background: #2563eb; color: #fff; }
+.portal-admin      { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+.portal-admin:hover { background: #d97706; color: #fff; }
+.portal-accountant { background: #f5f3ff; color: #5b21b6; border-color: #c4b5fd; }
+.portal-accountant:hover { background: #7c3aed; color: #fff; }
+.portal-superadmin { background: #fdf2f8; color: #9d174d; border-color: #f9a8d4; }
+.portal-superadmin:hover { background: #be185d; color: #fff; }
