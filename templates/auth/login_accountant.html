@@ -26,16 +26,6 @@
                    placeholder="Your password">
             <button class="btn btn-accountant" type="submit" style="margin-top:4px;">Sign In as Accountant</button>
         </form>
-
-        <div class="login-portals">
-            <p>Other login portals:</p>
-            <div class="portal-links">
-                <a href="{% url 'login_student' %}" class="portal-btn portal-student">Student</a>
-                <a href="{% url 'login_teacher' %}" class="portal-btn portal-teacher">Teacher</a>
-                <a href="{% url 'school_admin:login' %}" class="portal-btn portal-admin">Admin</a>
-                <a href="{% url 'school_admin:login' %}" class="portal-btn portal-superadmin">School Admin</a>
-            </div>
-        </div>
     </div>
 </div>
 {% endblock %}
