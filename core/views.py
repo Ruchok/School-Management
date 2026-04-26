@@ -21,11 +21,14 @@ def _role_home_url(user):
 	return "/dashboard/"
 
 
-class HomeRedirectView(RedirectView):
-	def get_redirect_url(self, *args, **kwargs):
-		if self.request.user.is_authenticated:
-			return _role_home_url(self.request.user)
-		return "/login/"
+class HomePageView(TemplateView):
+	"""Home/Landing page - shows login options for unauthenticated, redirects authenticated users."""
+	template_name = 'landing.html'
+
+	def dispatch(self, request, *args, **kwargs):
+		if request.user.is_authenticated:
+			return redirect(_role_home_url(request.user))
+		return super().dispatch(request, *args, **kwargs)
 
 
 # ---------------------------------------------------------------------------
@@ -119,7 +122,7 @@ class AccountantLoginView(_RoleLoginView):
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
-	login_url = '/login/'
+	login_url = '/'
 
 	def dispatch(self, request, *args, **kwargs):
 		# School admins / superusers belong in the school-admin panel, not here

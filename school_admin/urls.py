@@ -36,6 +36,10 @@ urlpatterns = [
     path('routines/<int:pk>/edit/', views.AdminRoutineEditView.as_view(), name='routine_edit'),
     path('routines/delete/', views.AdminRoutineDeleteView.as_view(), name='routine_delete'),
     
+    # Result Checking
+    path('results/', views.AdminResultsListView.as_view(), name='results_list'),
+    path('results/exam/<int:exam_id>/', views.AdminResultDetailView.as_view(), name='exam_results_detail'),
+    
     # User Management
     path('users/', views.AdminUsersView.as_view(), name='users'),
 ]

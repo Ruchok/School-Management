@@ -1,0 +1,238 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>School Management System - Welcome</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-image: url('{% static 'img/school-building.jpg' %}');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 0;
+            pointer-events: none;
+        }
+        .landing-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 1200px;
+        }
+        .hero-section {
+            text-align: center;
+            color: white;
+            margin-bottom: 60px;
+            animation: slideDown 0.6s ease-out;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+        .hero-section h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            letter-spacing: 1px;
+        }
+        .hero-section p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .hero-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .roles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        .role-card {
+            background: white;
+            border-radius: 12px;
+            padding: 40px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            text-decoration: none;
+            color: #333;
+            animation: fadeInUp 0.6s ease-out;
+            animation-fill-mode: both;
+            backdrop-filter: blur(5px);
+        }
+        .role-card:nth-child(1) { animation-delay: 0.1s; }
+        .role-card:nth-child(2) { animation-delay: 0.2s; }
+        .role-card:nth-child(3) { animation-delay: 0.3s; }
+        .role-card:nth-child(4) { animation-delay: 0.4s; }
+        .role-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        }
+        .role-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+        .role-card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .role-card p {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        .role-card .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        .role-card .btn:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .footer-text {
+            text-align: center;
+            color: white;
+            opacity: 0.9;
+            margin-top: 40px;
+            font-size: 0.9rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .footer-text p {
+            margin: 5px 0;
+        }
+        @media (max-width: 768px) {
+            .hero-section h1 {
+                font-size: 2rem;
+            }
+            .hero-section p {
+                font-size: 1rem;
+            }
+            .roles-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .role-card {
+                padding: 30px 20px;
+            }
+            .role-icon {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="landing-container">
+        <div class="hero-section">
+            <h1>🏫 School Management System</h1>
+            <p>ISLAMPUR GVT. JJKM GIRLS HIGHSCHOOL AND COLLEGE</p>
+            <div class="hero-subtitle">Select your role to continue</div>
+        </div>
+
+        <div class="roles-grid">
+            <!-- Student Portal -->
+            <a href="{% url 'login_student' %}" class="role-card">
+                <span class="role-icon">👩‍🎓</span>
+                <h2>Student</h2>
+                <p>Access your results, attendance, and fee information</p>
+                <button class="btn">Sign In as Student</button>
+            </a>
+
+            <!-- Teacher Portal -->
+            <a href="{% url 'login_teacher' %}" class="role-card">
+                <span class="role-icon">👨‍🏫</span>
+                <h2>Teacher</h2>
+                <p>Manage classes, attendance, and student results</p>
+                <button class="btn">Sign In as Teacher</button>
+            </a>
+
+            <!-- Accountant Portal -->
+            <a href="{% url 'login_accountant' %}" class="role-card">
+                <span class="role-icon">🧾</span>
+                <h2>Accountant</h2>
+                <p>Manage fees, invoices, and payments</p>
+                <button class="btn">Sign In as Accountant</button>
+            </a>
+
+            <!-- Admin Portal -->
+            <a href="{% url 'school_admin:login' %}" class="role-card">
+                <span class="role-icon">🛡️</span>
+                <h2>Admin</h2>
+                <p>School administration and system management</p>
+                <button class="btn">Sign In as Admin</button>
+            </a>
+        </div>
+
+        <div class="footer-text">
+            <p>&copy; 2026 School Management System. All rights reserved.</p>
+            <p>For support, please contact the system administrator.</p>
+        </div>
+    </div>
+</body>
+</html>

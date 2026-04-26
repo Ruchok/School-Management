@@ -10,6 +10,7 @@ from django.utils.decorators import method_decorator
 from academics.models import TeacherProfile, StudentProfile, SchoolClass, Subject
 from users.models import CustomUser
 from finance.models import FeePayment, FeeInvoice
+from exams.models import Exam, ExamResult
 from .models import ClassRoutine
 from .forms import StudentForm, TeacherForm, FeePaymentForm, ClassRoutineForm
 
@@ -93,7 +94,7 @@ class AdminLogoutView(View):
             request.session.pop(key, None)
         auth_logout(request)
         messages.success(request, 'You have been logged out.')
-        return redirect('school_admin:login')
+        return redirect('home')
 
 
 # ===== DASHBOARD VIEW =====
@@ -539,6 +540,101 @@ class AdminRoutineDeleteView(AdminAuthMixin, View):
             messages.error(request, 'Schedule not found')
         
         return redirect('school_admin:routines_list')
+
+
+# ===== RESULT CHECKING VIEW =====
+
+class AdminResultsListView(AdminAuthMixin, View):
+    """View and manage exam results"""
+    
+    template_name = 'school_admin/results_list.html'
+    
+    def get(self, request):
+        is_principle_admin = request.session.get('principle_admin_authenticated', False)
+        
+        # Get filter parameters
+        search = request.GET.get('search', '')
+        exam_filter = request.GET.get('exam', '')
+        classroom_filter = request.GET.get('classroom', '')
+        
+        # Get all results with related data
+        results = ExamResult.objects.select_related(
+            'exam', 'exam__classroom', 'student', 'student__user', 'student__classroom'
+        ).all()
+        
+        # Apply filters
+        if search:
+            results = results.filter(
+                Q(student__user__first_name__icontains=search) |
+                Q(student__user__last_name__icontains=search) |
+                Q(student__user__username__icontains=search) |
+                Q(exam__title__icontains=search)
+            )
+        
+        if exam_filter:
+            results = results.filter(exam__id=exam_filter)
+        
+        if classroom_filter:
+            results = results.filter(exam__classroom__id=classroom_filter)
+        
+        # Get exams and classrooms for filter dropdowns
+        exams = Exam.objects.all().order_by('-exam_date')
+        classrooms = SchoolClass.objects.all()
+        
+        # Add stats
+        total_results = ExamResult.objects.count()
+        avg_marks = ExamResult.objects.values('exam').annotate(avg=Count('marks'))
+        
+        context = {
+            'results': results.order_by('-exam__exam_date')[:100],  # Paginate in future
+            'exams': exams,
+            'classrooms': classrooms,
+            'total_results': total_results,
+            'search': search,
+            'exam_filter': exam_filter,
+            'classroom_filter': classroom_filter,
+            'is_principle_admin': is_principle_admin,
+        }
+        
+        return render(request, self.template_name, context)
+
+
+class AdminResultDetailView(AdminAuthMixin, View):
+    """View detailed results for an exam"""
+    
+    template_name = 'school_admin/exam_results_detail.html'
+    
+    def get(self, request, exam_id):
+        is_principle_admin = request.session.get('principle_admin_authenticated', False)
+        
+        exam = get_object_or_404(Exam, id=exam_id)
+        results = ExamResult.objects.filter(exam=exam).select_related(
+            'student', 'student__user', 'student__classroom'
+        ).order_by('student__user__first_name')
+        
+        # Calculate statistics
+        total_students = results.count()
+        avg_marks = sum(r.marks for r in results) / total_students if total_students > 0 else 0
+        highest_marks = max((r.marks for r in results), default=0)
+        lowest_marks = min((r.marks for r in results), default=0)
+        
+        grade_distribution = {}
+        for result in results:
+            grade = result.grade
+            grade_distribution[grade] = grade_distribution.get(grade, 0) + 1
+        
+        context = {
+            'exam': exam,
+            'results': results,
+            'total_students': total_students,
+            'avg_marks': round(avg_marks, 2),
+            'highest_marks': highest_marks,
+            'lowest_marks': lowest_marks,
+            'grade_distribution': grade_distribution,
+            'is_principle_admin': is_principle_admin,
+        }
+        
+        return render(request, self.template_name, context)
 
 
 # ===== USER MANAGEMENT VIEW =====

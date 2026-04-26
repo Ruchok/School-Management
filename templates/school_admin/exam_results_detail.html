@@ -1,0 +1,270 @@
+{% extends 'school_admin/base_admin.html' %}
+
+{% block title %}Exam Results - {{ exam.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .exam-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+    
+    .exam-title {
+        font-size: 28px;
+        margin-bottom: 10px;
+    }
+    
+    .exam-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 20px;
+    }
+    
+    .info-item {
+        background: rgba(255,255,255,0.1);
+        padding: 15px;
+        border-radius: 6px;
+    }
+    
+    .info-label {
+        font-size: 12px;
+        opacity: 0.8;
+    }
+    
+    .info-value {
+        font-size: 20px;
+        font-weight: bold;
+        margin-top: 5px;
+    }
+    
+    .results-container {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-box {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    
+    .stat-number {
+        font-size: 32px;
+        font-weight: bold;
+        color: #667eea;
+    }
+    
+    .stat-label {
+        color: #666;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+    
+    .results-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+    
+    .results-table thead {
+        background: #f0f0f0;
+    }
+    
+    .results-table th,
+    .results-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .results-table tr:hover {
+        background: #f9f9f9;
+    }
+    
+    .grade-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 12px;
+    }
+    
+    .grade-a-plus { background: #28a745; color: white; }
+    .grade-a { background: #5cb85c; color: white; }
+    .grade-b { background: #ffc107; color: #333; }
+    .grade-c { background: #ff9800; color: white; }
+    .grade-f { background: #dc3545; color: white; }
+    
+    .grade-distribution-chart {
+        display: flex;
+        gap: 10px;
+        margin: 20px 0;
+    }
+    
+    .grade-bar {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+    }
+    
+    .grade-bar-fill {
+        width: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 4px 4px 0 0;
+        min-height: 30px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+    }
+    
+    .grade-bar-label {
+        margin-top: 10px;
+        font-weight: bold;
+        color: #333;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 8px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 14px;
+    }
+    
+    .btn-primary:hover {
+        opacity: 0.9;
+    }
+    
+    .percentage {
+        color: #667eea;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <a href="{% url 'school_admin:results_list' %}" class="btn-primary" style="margin-bottom: 20px;">← Back to Results</a>
+    
+    <!-- Exam Header -->
+    <div class="exam-header">
+        <div class="exam-title">{{ exam.title }}</div>
+        <div class="exam-info">
+            <div class="info-item">
+                <div class="info-label">Classroom</div>
+                <div class="info-value">{{ exam.classroom.name }} {{ exam.classroom.section }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Exam Date</div>
+                <div class="info-value">{{ exam.exam_date|date:"d M, Y" }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Total Marks</div>
+                <div class="info-value">{{ exam.total_marks }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Students Evaluated</div>
+                <div class="info-value">{{ total_students }}</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Statistics -->
+    <div class="stats-grid">
+        <div class="stat-box">
+            <div class="stat-number">{{ avg_marks }}</div>
+            <div class="stat-label">Average Marks</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">{{ highest_marks }}</div>
+            <div class="stat-label">Highest Marks</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">{{ lowest_marks }}</div>
+            <div class="stat-label">Lowest Marks</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">{{ total_students }}</div>
+            <div class="stat-label">Total Students</div>
+        </div>
+    </div>
+    
+    <!-- Grade Distribution -->
+    {% if grade_distribution %}
+    <div class="results-container">
+        <h4 style="margin-bottom: 20px;">📊 Grade Distribution</h4>
+        <div class="grade-distribution-chart">
+            {% for grade, count in grade_distribution.items %}
+            <div class="grade-bar">
+                <div class="grade-bar-fill" style="height: {% widthratio count total_students 100 %}px; min-height: 30px;">
+                    <span>{{ count }}</span>
+                </div>
+                <div class="grade-bar-label grade-badge grade-{{ grade|lower }}">{{ grade }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Results Table -->
+    <div class="results-container">
+        <h4 style="margin-bottom: 20px;">👥 Student Results</h4>
+        {% if results %}
+        <table class="results-table">
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Roll Number</th>
+                    <th>Marks</th>
+                    <th>Percentage</th>
+                    <th>Grade</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                <tr>
+                    <td>{{ result.student.user.get_full_name|default:result.student.user.username }}</td>
+                    <td>{{ result.student.roll_number }}</td>
+                    <td><strong>{{ result.marks }}/{{ exam.total_marks }}</strong></td>
+                    <td>
+                        <span class="percentage">
+                            {% widthratio result.marks exam.total_marks 100 %}%
+                        </span>
+                    </td>
+                    <td><span class="grade-badge grade-{{ result.grade|lower }}">{{ result.grade }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div style="text-align: center; padding: 40px; color: #999;">
+            <h5>No Results Available</h5>
+            <p>Results will appear here once they are published.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
