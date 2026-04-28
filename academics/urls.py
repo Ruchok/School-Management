@@ -1,7 +1,7 @@
 from django.urls import path
 from django.views.generic import TemplateView
 
-from .views import ClassListCreateView, StudentListCreateView, SubjectListCreateView, StudentSearchView, TeacherListCreateView, TeacherSearchView
+from .views import ClassListCreateView, StudentListCreateView, SubjectListCreateView, StudentSearchView, TeacherListCreateView, TeacherSearchView, StudentTeacherSearchView
 from .api_views import students_data_api, classes_data_api, subjects_data_api, attendance_data_api, exams_data_api, payments_data_api, teachers_data_api
 
 app_name = "academics"
@@ -14,6 +14,7 @@ urlpatterns = [
     path("search/", StudentSearchView.as_view(), name="search"),
     path("teachers/", TeacherListCreateView.as_view(), name="teachers"),
     path("teachers/search/", TeacherSearchView.as_view(), name="teachers_search"),
+    path("student/teachers/search/", StudentTeacherSearchView.as_view(), name="student_teachers_search"),
     
     # AG Grid views
     path("grid/students/", TemplateView.as_view(template_name="academics/students_grid.html"), name="students_grid"),

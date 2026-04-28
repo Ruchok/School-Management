@@ -8,8 +8,8 @@
     <!-- Header -->
     <div class="row mb-4">
         <div class="col-12">
-            <h1 class="h3 mb-2">Student Dashboard</h1>
-            <p class="text-muted">Welcome, {% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.username }}{% endif %}! Here's your academic and financial information.</p>
+            <h1 class="h3 mb-2">📚 My Dashboard</h1>
+            <p class="text-muted">Welcome, <strong>{{ user.get_full_name|default:user.username }}</strong>! Here's your academic information.</p>
         </div>
     </div>
 
@@ -20,31 +20,26 @@
         </div>
     {% elif student_profile %}
 
-    <!-- Student Info Card -->
+    <!-- Student Profile Card -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card">
+            <div class="card shadow-sm">
                 <div class="card-body">
-                    <div class="row">
+                    <div class="row align-items-center">
                         <div class="col-md-8">
-                            <h5>{{ user.get_full_name }}</h5>
-                            <p class="text-muted mb-1">
-                                <strong>Roll Number:</strong> {{ student_profile.roll_number }}
-                            </p>
-                            <p class="text-muted mb-1">
-                                <strong>Class:</strong> {{ student_profile.classroom|default:"Not assigned" }}
-                            </p>
-                            <p class="text-muted mb-1">
-                                <strong>Guardian:</strong> {{ student_profile.guardian_name }}
-                            </p>
-                            <p class="text-muted">
-                                <strong>Guardian Phone:</strong> {{ student_profile.guardian_phone }}
-                            </p>
-                        </div>
-                        <div class="col-md-4">
-                            <p class="text-muted">
-                                <strong>Admission Date:</strong> {{ student_profile.admission_date|date:"d M, Y" }}
-                            </p>
+                            <h5 class="mb-3">📋 Student Information</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-2"><strong>Name:</strong> <span class="text-dark">{{ user.get_full_name }}</span></p>
+                                    <p class="mb-2"><strong>Roll Number:</strong> <span class="badge bg-primary">{{ student_profile.roll_number }}</span></p>
+                                    <p class="mb-2"><strong>Class:</strong> <span class="text-dark">{{ student_profile.classroom|default:"Not assigned" }}</span></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-2"><strong>Guardian:</strong> <span class="text-dark">{{ student_profile.guardian_name }}</span></p>
+                                    <p class="mb-2"><strong>Contact:</strong> <span class="text-dark">{{ student_profile.guardian_phone }}</span></p>
+                                    <p class="mb-2"><strong>Joined:</strong> <span class="text-dark">{{ student_profile.admission_date|date:"d M, Y" }}</span></p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -52,280 +47,165 @@
         </div>
     </div>
 
-    <!-- Statistics Row -->
-    <div class="row mb-4">
-        <div class="col-md-3 mb-3">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="text-muted mb-1">Subjects</p>
-                            <h4 class="mb-0">{{ stats.subjects }}</h4>
-                        </div>
-                        <div class="badge bg-primary" style="font-size: 2rem;">📚</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3 mb-3">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="text-muted mb-1">Exams</p>
-                            <h4 class="mb-0">{{ stats.exams }}</h4>
-                        </div>
-                        <div class="badge bg-success" style="font-size: 2rem;">✏️</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3 mb-3">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="text-muted mb-1">Results</p>
-                            <h4 class="mb-0">{{ stats.results }}</h4>
-                        </div>
-                        <div class="badge bg-info" style="font-size: 2rem;">📊</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3 mb-3">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="text-muted mb-1">Attendance</p>
-                            <h4 class="mb-0">{{ stats.attendance_percentage }}%</h4>
-                        </div>
-                        <div class="badge bg-warning" style="font-size: 2rem;">📋</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Academics Section -->
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="mb-0">Your Subjects</h6>
-                </div>
-                <div class="card-body">
-                    {% if subjects %}
-                        <table class="table table-sm table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Subject</th>
-                                    <th>Code</th>
-                                    <th>Teacher</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for subject in subjects %}
-                                    <tr>
-                                        <td><strong>{{ subject.name }}</strong></td>
-                                        <td>{{ subject.code }}</td>
-                                        <td>{{ subject.teacher.get_full_name|default:subject.teacher.username|default:"TBA" }}</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    {% else %}
-                        <p class="text-muted">No subjects assigned yet.</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="mb-0">Exam Results (Latest 5)</h6>
+    <!-- Main Content Tabs/Sections -->
+    <div class="row">
+        <!-- Results Section -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">📊 Your Exam Results</h5>
                 </div>
                 <div class="card-body">
                     {% if exam_results %}
-                        <table class="table table-sm table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Exam</th>
-                                    <th>Marks</th>
-                                    <th>Grade</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for result in exam_results %}
-                                    <tr>
-                                        <td><strong>{{ result.exam.title }}</strong></td>
-                                        <td>{{ result.marks }} / {{ result.exam.total_marks }}</td>
-                                        <td>
-                                            {% if result.grade == "A+" %}
-                                                <span class="badge bg-success">{{ result.grade }}</span>
-                                            {% elif result.grade == "A" %}
-                                                <span class="badge bg-info">{{ result.grade }}</span>
-                                            {% elif result.grade == "B" %}
-                                                <span class="badge bg-warning">{{ result.grade }}</span>
-                                            {% elif result.grade == "C" %}
-                                                <span class="badge bg-warning">{{ result.grade }}</span>
-                                            {% else %}
-                                                <span class="badge bg-danger">{{ result.grade }}</span>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    {% else %}
-                        <p class="text-muted">No exam results yet.</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Attendance Section -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="mb-0">Attendance Records (Latest 10)</h6>
-                </div>
-                <div class="card-body">
-                    {% if attendance_records %}
                         <div class="table-responsive">
-                            <table class="table table-sm table-striped">
-                                <thead>
+                            <table class="table table-sm">
+                                <thead class="table-light">
                                     <tr>
-                                        <th>Date</th>
-                                        <th>Status</th>
-                                        <th>Notes</th>
+                                        <th>Exam Name</th>
+                                        <th class="text-center">Marks</th>
+                                        <th class="text-center">Grade</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for record in attendance_records %}
+                                    {% for result in exam_results %}
                                         <tr>
-                                            <td>{{ record.attendance.date|date:"d M, Y" }}</td>
                                             <td>
-                                                {% if record.status == "PRESENT" %}
-                                                    <span class="badge bg-success">Present</span>
-                                                {% elif record.status == "ABSENT" %}
-                                                    <span class="badge bg-danger">Absent</span>
+                                                <strong>{{ result.exam.title|truncatewords:3 }}</strong>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge bg-info">{{ result.marks }}/{{ result.exam.total_marks }}</span>
+                                            </td>
+                                            <td class="text-center">
+                                                {% if result.grade == "A+" %}
+                                                    <span class="badge bg-success">{{ result.grade }}</span>
+                                                {% elif result.grade == "A" %}
+                                                    <span class="badge bg-info">{{ result.grade }}</span>
+                                                {% elif result.grade == "B" %}
+                                                    <span class="badge bg-warning">{{ result.grade }}</span>
+                                                {% elif result.grade == "C" %}
+                                                    <span class="badge bg-warning">{{ result.grade }}</span>
                                                 {% else %}
-                                                    <span class="badge bg-warning">Late</span>
+                                                    <span class="badge bg-danger">{{ result.grade }}</span>
                                                 {% endif %}
                                             </td>
-                                            <td>{{ record.attendance.notes|default:"-" }}</td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
                         </div>
                     {% else %}
-                        <p class="text-muted">No attendance records yet.</p>
+                        <div class="alert alert-info mb-0">
+                            <i class="fas fa-info-circle"></i> No exam results available yet.
+                        </div>
                     {% endif %}
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Financial Section -->
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="mb-0">Financial Summary</h6>
+        <!-- Class Routine Section -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">📅 Class Routine & Schedule</h5>
                 </div>
                 <div class="card-body">
-                    <div class="row text-center mb-3">
-                        <div class="col-md-6">
-                            <p class="text-muted mb-1">Total Due</p>
-                            <h5 class="text-danger">₹{{ financial_summary.total_due }}</h5>
-                        </div>
-                        <div class="col-md-6">
-                            <p class="text-muted mb-1">Total Paid</p>
-                            <h5 class="text-success">₹{{ financial_summary.total_paid }}</h5>
-                        </div>
-                    </div>
-                    <hr>
-                    <div class="text-center">
-                        <p class="text-muted mb-1">Outstanding Balance</p>
-                        <h4 class="{% if financial_summary.balance > 0 %}text-danger{% else %}text-success{% endif %}">
-                            ₹{{ financial_summary.balance }}
-                        </h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="mb-0">Recent Invoices</h6>
-                </div>
-                <div class="card-body">
-                    {% if invoices %}
-                        <table class="table table-sm table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Fee Type</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for invoice in invoices %}
+                    {% if subjects %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead class="table-light">
                                     <tr>
-                                        <td>{{ invoice.fee_structure.title }}</td>
-                                        <td>₹{{ invoice.amount_due }}</td>
-                                        <td>
-                                            {% if invoice.status == "PAID" %}
-                                                <span class="badge bg-success">Paid</span>
-                                            {% elif invoice.status == "PARTIAL" %}
-                                                <span class="badge bg-warning">Partial</span>
-                                            {% else %}
-                                                <span class="badge bg-danger">Pending</span>
-                                            {% endif %}
-                                        </td>
+                                        <th>Subject</th>
+                                        <th>Teacher</th>
+                                        <th class="text-center">Code</th>
                                     </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {% for subject in subjects %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ subject.name }}</strong>
+                                            </td>
+                                            <td>
+                                                <span>{{ subject.teacher.get_full_name|default:subject.teacher.username|default:"TBA" }}</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge bg-secondary">{{ subject.code }}</span>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     {% else %}
-                        <p class="text-muted">No invoices yet.</p>
+                        <div class="alert alert-info mb-0">
+                            <i class="fas fa-info-circle"></i> No subjects assigned yet.
+                        </div>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Quick Links -->
+    <!-- Teacher Details Section -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="mb-0">Quick Links</h6>
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">👨‍🏫 Find & Contact Your Teachers</h5>
                 </div>
                 <div class="card-body">
-                    <a href="{% url 'exams:results' %}" class="btn btn-outline-primary me-2">View Results</a>
-                    <a href="{% url 'academics:students' %}" class="btn btn-outline-info me-2">My Profile</a>
-                    <a href="{% url 'finance:payments' %}" class="btn btn-outline-success me-2">Fee Status</a>
-                    <a href="{% url 'academics:classes' %}" class="btn btn-outline-warning">Class Info</a>
+                    <p class="text-muted mb-3">Search for your teacher's details, email, phone number, and more to get help and guidance.</p>
+                    <a href="{% url 'academics:student_teachers_search' %}" class="btn btn-lg btn-primary">
+                        <i class="fas fa-search me-2"></i> Search Teachers
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 
     {% else %}
-        <div class="alert alert-info">
-            No student profile found. Please contact administration.
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle"></i> <strong>No student profile found.</strong> Please contact administration.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     {% endif %}
 </div>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 8px;
+    }
+
+    .card-header {
+        border-radius: 8px 8px 0 0;
+        padding: 1rem;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead {
+        background-color: #f8f9fa;
+    }
+
+    .table tbody tr {
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .badge {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.6rem;
+    }
+
+    .alert {
+        border-radius: 8px;
+        border: none;
+    }
+</style>
 {% endblock %}

@@ -73,6 +73,7 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
+                'django.template.context_processors.csrf',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'school_admin.context_processors.admin_context',
@@ -180,8 +181,12 @@ LOGOUT_REDIRECT_URL = 'home'
 CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://127.0.0.1:8000', 'http://localhost', 'http://127.0.0.1']
 CSRF_COOKIE_SECURE = False  # Set to True only in production with HTTPS
 CSRF_COOKIE_HTTPONLY = False
+CSRF_COOKIE_AGE = 31449600  # One year
 SESSION_COOKIE_SECURE = False  # Set to True only in production with HTTPS
 SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_AGE = 1209600  # Two weeks
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

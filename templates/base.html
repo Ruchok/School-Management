@@ -129,25 +129,13 @@
 
             {% elif user.role == "STUDENT" %}
             {# ── STUDENT NAV ── #}
-            <div class="nav-section-label">My Academics</div>
-            <a href="{% url 'academics:subjects' %}" class="nav-link">
-                <span class="nav-icon">📖</span><span>Subjects</span>
+            <div class="nav-section-label">Menu</div>
+            <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <span class="nav-icon">📊</span><span>My Dashboard</span>
             </a>
-            <a href="{% url 'attendance:list' %}" class="nav-link">
-                <span class="nav-icon">✅</span><span>My Attendance</span>
+            <a href="{% url 'academics:student_teachers_search' %}" class="nav-link">
+                <span class="nav-icon">👨‍🏫</span><span>Find Teachers</span>
             </a>
-            <a href="{% url 'exams:list' %}" class="nav-link">
-                <span class="nav-icon">📝</span><span>Exams</span>
-            </a>
-            <a href="{% url 'exams:results' %}" class="nav-link">
-                <span class="nav-icon">📈</span><span>My Results</span>
-            </a>
-            <div class="nav-section-label">Finance</div>
-            <a href="{% url 'finance:invoices' %}" class="nav-link">
-                <span class="nav-icon">🧾</span><span>My Invoices</span>
-            </a>
-            <a href="{% url 'finance:payments' %}" class="nav-link">
-                <span class="nav-icon">💰</span><span>My Payments</span>
             </a>
 
             {% elif user.role == "ACCOUNTANT" %}

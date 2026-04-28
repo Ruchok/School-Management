@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Permission Denied - School Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-6 mx-auto">
+            <div class="card border-danger shadow">
+                <div class="card-body text-center py-5">
+                    <h1 class="mb-3" style="font-size: 4rem;">🚫</h1>
+                    <h2 class="card-title mb-3">Access Forbidden (403)</h2>
+                    
+                    {% if "csrf" in request.build_absolute_uri|lower %}
+                        <h4 class="text-danger mb-3">CSRF Verification Failed</h4>
+                        <p class="text-muted mb-4">
+                            Your request could not be processed for security reasons. This is likely due to:
+                        </p>
+                        <ul class="text-muted text-start" style="display: inline-block;">
+                            <li><strong>Expired session</strong> - Your login session may have expired</li>
+                            <li><strong>Cookie issues</strong> - Browser cookies might be disabled or cleared</li>
+                            <li><strong>Browser extensions</strong> - Some extensions can interfere with forms</li>
+                            <li><strong>Form timeout</strong> - You may have spent too long filling out the form</li>
+                        </ul>
+                    {% else %}
+                        <p class="text-muted mb-4">
+                            You don't have permission to access this resource.
+                        </p>
+                    {% endif %}
+
+                    <div class="alert alert-info mt-4" role="alert">
+                        <strong>Try this:</strong>
+                        <ol class="text-start mt-2">
+                            <li>Clear your browser cookies and cache</li>
+                            <li>Refresh the page</li>
+                            <li>Try again</li>
+                            <li>If the problem persists, try a different browser</li>
+                        </ol>
+                    </div>
+
+                    <div class="mt-4">
+                        <a href="/" class="btn btn-primary me-2">
+                            <i class="fas fa-home"></i> Go to Home
+                        </a>
+                        <a href="javascript:history.back()" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Go Back
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

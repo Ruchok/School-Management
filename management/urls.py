@@ -1,4 +1,3 @@
-"""URL configuration for management project."""
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -11,6 +10,8 @@ from core.views import (
     StudentLoginView,
     TeacherLoginView,
     AccountantLoginView,
+    csrf_failure,
+    CsrfDebugView,
 )
 
 urlpatterns = [
@@ -24,6 +25,10 @@ urlpatterns = [
     # Admin / Principle Admin / Superuser → /school-admin/login/
 
     path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
+    
+    # Debug views
+    path('debug/csrf/', CsrfDebugView.as_view(), name='csrf_debug'),
+    
     path('admin/', admin.site.urls),
     path('school-admin/', include('school_admin.urls')),
     path('academics/', include('academics.urls')),

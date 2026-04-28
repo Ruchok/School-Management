@@ -8,7 +8,15 @@ from .models import SchoolClass, StudentProfile, Subject, TeacherProfile
 from school_admin.models import ClassRoutine
 
 
-class ClassListCreateView(LoginRequiredMixin, View):
+class NonStudentRequiredMixin:
+	"""Mixin to prevent students from accessing teacher/admin views"""
+	def dispatch(self, request, *args, **kwargs):
+		if request.user.is_authenticated and request.user.role == 'STUDENT':
+			return redirect('home')
+		return super().dispatch(request, *args, **kwargs)
+
+
+class ClassListCreateView(NonStudentRequiredMixin, LoginRequiredMixin, View):
 	template_name = "academics/classes.html"
 
 	def get(self, request):
@@ -25,7 +33,7 @@ class ClassListCreateView(LoginRequiredMixin, View):
 		return render(request, self.template_name, {"form": form, "classes": classes})
 
 
-class SubjectListCreateView(LoginRequiredMixin, View):
+class SubjectListCreateView(NonStudentRequiredMixin, LoginRequiredMixin, View):
 	template_name = "academics/subjects.html"
 
 	def get(self, request):
@@ -42,14 +50,14 @@ class SubjectListCreateView(LoginRequiredMixin, View):
 		return render(request, self.template_name, {"form": form, "subjects": subjects})
 
 
-class StudentListCreateView(LoginRequiredMixin, View):
+class StudentListCreateView(NonStudentRequiredMixin, LoginRequiredMixin, View):
 	template_name = "academics/students.html"
 
 	def get(self, request):
 		return render(request, self.template_name)
 
 
-class StudentSearchView(LoginRequiredMixin, View):
+class StudentSearchView(NonStudentRequiredMixin, LoginRequiredMixin, View):
 	template_name = "academics/search.html"
 
 	def get(self, request):
@@ -78,7 +86,7 @@ class StudentSearchView(LoginRequiredMixin, View):
 		})
 
 
-class TeacherListCreateView(LoginRequiredMixin, View):
+class TeacherListCreateView(NonStudentRequiredMixin, LoginRequiredMixin, View):
 	template_name = "academics/teachers.html"
 
 	def get(self, request):
@@ -86,7 +94,7 @@ class TeacherListCreateView(LoginRequiredMixin, View):
 		return render(request, self.template_name, {"teachers": teachers})
 
 
-class TeacherSearchView(LoginRequiredMixin, View):
+class TeacherSearchView(NonStudentRequiredMixin, LoginRequiredMixin, View):
 	template_name = "academics/teacher_search.html"
 
 	def get(self, request):
@@ -106,4 +114,54 @@ class TeacherSearchView(LoginRequiredMixin, View):
 			"query": query,
 			"results": results,
 			"count": results.count()
+		})
+
+
+class StudentTeacherSearchView(LoginRequiredMixin, View):
+	"""Search view for students to find and contact teachers.
+	Only students can access this view."""
+	template_name = "academics/student_teacher_search.html"
+	login_url = '/login/student/'
+
+	def dispatch(self, request, *args, **kwargs):
+		# Only allow students to access this view
+		if request.user.role != 'STUDENT':
+			return redirect('home')
+		return super().dispatch(request, *args, **kwargs)
+
+	def get(self, request):
+		query = request.GET.get('q', '')
+		results = []
+		teachers_list = []
+		
+		# Get all teachers with their subjects
+		all_teachers = TeacherProfile.objects.select_related("user").prefetch_related(
+			'user__subjects'
+		)
+		
+		# If search query exists, filter teachers
+		if query:
+			results = all_teachers.filter(
+				Q(user__first_name__icontains=query) |
+				Q(user__last_name__icontains=query) |
+				Q(user__email__icontains=query) |
+				Q(qualification__icontains=query)
+			)
+		else:
+			# Show all teachers if no query
+			results = all_teachers
+		
+		# Build enhanced teacher list with their subjects
+		for teacher in results:
+			teacher_data = {
+				'profile': teacher,
+				'subjects': Subject.objects.filter(teacher=teacher.user),
+			}
+			teachers_list.append(teacher_data)
+		
+		return render(request, self.template_name, {
+			"query": query,
+			"results": teachers_list,
+			"count": len(teachers_list),
+			"total_teachers": all_teachers.count(),
 		})

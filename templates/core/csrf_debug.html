@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}CSRF Debug - School Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">🔍 CSRF Token Debug Information</h4>
+                </div>
+                <div class="card-body">
+                    <h5>Current Session Information</h5>
+                    <table class="table table-striped">
+                        <tr>
+                            <td><strong>Session Active:</strong></td>
+                            <td>
+                                {% if has_session %}
+                                    <span class="badge bg-success">✓ Yes</span>
+                                {% else %}
+                                    <span class="badge bg-warning">✗ No</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Session Key:</strong></td>
+                            <td><code>{{ session_key|default:"None" }}</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Current User:</strong></td>
+                            <td>{{ user }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CSRF Token:</strong></td>
+                            <td>
+                                <code class="text-break">{{ csrf_token }}</code>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <h5 class="mt-4">Browser Cookies</h5>
+                    {% if cookies %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                {% for key, value in cookies.items %}
+                                <tr>
+                                    <td><strong>{{ key }}</strong></td>
+                                    <td><code class="text-break">{{ value }}</code></td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No cookies found.</p>
+                    {% endif %}
+
+                    <h5 class="mt-4">Troubleshooting Steps</h5>
+                    <div class="alert alert-info">
+                        <ol>
+                            <li><strong>Clear Browser Cache:</strong>
+                                <ul>
+                                    <li>Press <kbd>Ctrl+Shift+Delete</kbd> (Windows/Linux) or <kbd>Cmd+Shift+Delete</kbd> (Mac)</li>
+                                    <li>Select "Cookies and other site data"</li>
+                                    <li>Click "Clear data"</li>
+                                </ul>
+                            </li>
+                            <li><strong>Close All Browser Tabs:</strong> Close and reopen the browser completely</li>
+                            <li><strong>Disable Extensions:</strong> Try disabling browser extensions that might interfere with cookies</li>
+                            <li><strong>Refresh This Page:</strong> <a href="{% url 'csrf_debug' %}" class="btn btn-sm btn-primary">Refresh</a></li>
+                            <li><strong>Try Login Again:</strong> <a href="/login/student/" class="btn btn-sm btn-success">Go to Student Login</a></li>
+                        </ol>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <strong>ℹ️ Note:</strong> If you continue to experience CSRF errors after following these steps, 
+                        your browser's cookie settings might be too restrictive, or you might have a security software 
+                        interfering with form submissions.
+                    </div>
+
+                    <h5 class="mt-4">System Status</h5>
+                    <div class="alert alert-success">
+                        <strong>✓ CSRF Protection:</strong> Enabled and working<br>
+                        <strong>✓ Sessions:</strong> Enabled<br>
+                        <strong>✓ Cookies:</strong> Supported by your browser
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

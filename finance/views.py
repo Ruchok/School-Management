@@ -6,7 +6,15 @@ from .forms import FeeInvoiceForm, FeePaymentForm, FeeStructureForm
 from .models import FeeInvoice, FeePayment, FeeStructure
 
 
-class FeeStructureListCreateView(LoginRequiredMixin, View):
+class NonStudentRequiredMixin:
+	"""Mixin to prevent students from accessing teacher/admin views"""
+	def dispatch(self, request, *args, **kwargs):
+		if request.user.is_authenticated and request.user.role == 'STUDENT':
+			return redirect('home')
+		return super().dispatch(request, *args, **kwargs)
+
+
+class FeeStructureListCreateView(NonStudentRequiredMixin, LoginRequiredMixin, View):
 	template_name = "finance/structures.html"
 
 	def get(self, request):
@@ -23,7 +31,7 @@ class FeeStructureListCreateView(LoginRequiredMixin, View):
 		return render(request, self.template_name, {"form": form, "structures": structures})
 
 
-class InvoiceListCreateView(LoginRequiredMixin, View):
+class InvoiceListCreateView(NonStudentRequiredMixin, LoginRequiredMixin, View):
 	template_name = "finance/invoices.html"
 
 	def get(self, request):
@@ -40,7 +48,7 @@ class InvoiceListCreateView(LoginRequiredMixin, View):
 		return render(request, self.template_name, {"form": form, "invoices": invoices})
 
 
-class PaymentListCreateView(LoginRequiredMixin, View):
+class PaymentListCreateView(NonStudentRequiredMixin, LoginRequiredMixin, View):
 	template_name = "finance/payments.html"
 
 	def get(self, request):

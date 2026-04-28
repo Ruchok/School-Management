@@ -321,3 +321,50 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 			"recent_payments": payments.select_related("invoice__student__user").order_by("-id")[:6],
 			"pending_invoices": invoices.filter(status="PENDING").select_related("student__user")[:10],
 		}
+
+
+def csrf_failure(request, reason=""):
+	"""Handle CSRF verification failures gracefully."""
+	from django.http import HttpResponse
+	return HttpResponse(
+		f"""
+		<html>
+		<head><title>CSRF Verification Failed</title></head>
+		<body style="font-family: Arial; text-align: center; padding: 50px;">
+			<h1>⚠️ CSRF Verification Failed</h1>
+			<p>Your request could not be processed for security reasons.</p>
+			<p><strong>Reason:</strong> {reason}</p>
+			<p>Please try the following:</p>
+			<ul style="text-align: left; display: inline-block;">
+				<li>Clear your browser cookies and cache</li>
+				<li>Disable browser extensions that might interfere with cookies</li>
+				<li>Try refreshing the page and submitting again</li>
+				<li>Use a different browser if the problem persists</li>
+			</ul>
+			<p><a href="/">Go back to home</a></p>
+		</body>
+		</html>
+		""",
+		status=403,
+		content_type="text/html"
+	)
+
+
+class CsrfDebugView(View):
+	"""Debug view to check CSRF token status"""
+	
+	def get(self, request):
+		from django.middleware.csrf import get_token
+		
+		# Generate a fresh CSRF token
+		csrf_token = get_token(request)
+		
+		context = {
+			'csrf_token': csrf_token,
+			'has_session': bool(request.session.session_key),
+			'session_key': request.session.session_key,
+			'cookies': {k: v[:20] + '...' if len(str(v)) > 20 else v for k, v in request.COOKIES.items()},
+			'user': request.user.username if request.user.is_authenticated else 'Anonymous',
+		}
+		
+		return render(request, 'core/csrf_debug.html', context)

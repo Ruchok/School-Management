@@ -9,7 +9,15 @@ from .forms import AttendanceBulkForm
 from .models import Attendance, AttendanceRecord
 
 
-class AttendanceListView(LoginRequiredMixin, View):
+class NonStudentRequiredMixin:
+	"""Mixin to prevent students from accessing teacher/admin views"""
+	def dispatch(self, request, *args, **kwargs):
+		if request.user.is_authenticated and request.user.role == 'STUDENT':
+			return redirect('home')
+		return super().dispatch(request, *args, **kwargs)
+
+
+class AttendanceListView(NonStudentRequiredMixin, LoginRequiredMixin, View):
 	template_name = "attendance/list.html"
 
 	def get(self, request):

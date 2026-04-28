@@ -6,7 +6,15 @@ from .forms import ExamForm, ExamResultForm
 from .models import Exam, ExamResult
 
 
-class ExamListCreateView(LoginRequiredMixin, View):
+class NonStudentRequiredMixin:
+	"""Mixin to prevent students from accessing teacher/admin views"""
+	def dispatch(self, request, *args, **kwargs):
+		if request.user.is_authenticated and request.user.role == 'STUDENT':
+			return redirect('home')
+		return super().dispatch(request, *args, **kwargs)
+
+
+class ExamListCreateView(NonStudentRequiredMixin, LoginRequiredMixin, View):
 	template_name = "exams/exams.html"
 
 	def get(self, request):
@@ -23,7 +31,7 @@ class ExamListCreateView(LoginRequiredMixin, View):
 		return render(request, self.template_name, {"form": form, "exams": exams})
 
 
-class ExamResultListCreateView(LoginRequiredMixin, View):
+class ExamResultListCreateView(NonStudentRequiredMixin, LoginRequiredMixin, View):
 	template_name = "exams/results.html"
 
 	def get(self, request):

@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block title %}Find Teachers - School Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="search-header-section">
+                <h1 class="h2 mb-2">👨‍🏫 Find Your Teachers</h1>
+                <p class="text-muted">Search and find teacher contact information to reach out for help and guidance</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Form -->
+    <div class="row mb-4">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <form method="get" class="search-form">
+                        <div class="input-group input-group-lg">
+                            <input 
+                                type="text" 
+                                name="q" 
+                                class="form-control border-0" 
+                                placeholder="Search by teacher name, email, or subject..."
+                                value="{{ query }}"
+                                autofocus
+                            />
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Summary -->
+    {% if query or results %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-info border-0" role="alert">
+                {% if count > 0 %}
+                    <strong>Found {{ count }}</strong> teacher{{ count|pluralize }} 
+                    {% if query %}matching "<strong>{{ query }}</strong>"{% endif %}
+                    <span class="float-end text-muted">(Total teachers: {{ total_teachers }})</span>
+                {% else %}
+                    <strong>No results found</strong> 
+                    {% if query %}for "<strong>{{ query }}</strong>"{% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Teachers List -->
+    {% if results %}
+    <div class="row">
+        {% for teacher_item in results %}
+        <div class="col-lg-6 col-xl-4 mb-4">
+            <div class="card h-100 shadow-sm border-0 teacher-card">
+                <!-- Teacher Header -->
+                <div class="card-header bg-light border-bottom d-flex align-items-center">
+                    <div class="teacher-avatar-circle">
+                        {{ teacher_item.profile.user.first_name|first|upper }}
+                    </div>
+                    <div class="ms-3">
+                        <h5 class="mb-0">{{ teacher_item.profile.user.get_full_name|default:teacher_item.profile.user.username }}</h5>
+                        <small class="text-muted">Teacher</small>
+                    </div>
+                </div>
+
+                <!-- Teacher Details -->
+                <div class="card-body">
+                    <!-- Contact Information -->
+                    <div class="contact-section mb-3">
+                        <h6 class="text-uppercase text-muted small font-weight-bold mb-2">Contact Information</h6>
+                        
+                        <!-- Email -->
+                        <div class="contact-item mb-2">
+                            <i class="fas fa-envelope text-primary"></i>
+                            <span class="ms-2">
+                                <a href="mailto:{{ teacher_item.profile.user.email }}" class="text-decoration-none">
+                                    {{ teacher_item.profile.user.email }}
+                                </a>
+                            </span>
+                        </div>
+
+                        <!-- Phone -->
+                        {% if teacher_item.profile.user.phone %}
+                        <div class="contact-item mb-2">
+                            <i class="fas fa-phone text-success"></i>
+                            <span class="ms-2">
+                                <a href="tel:{{ teacher_item.profile.user.phone }}" class="text-decoration-none">
+                                    {{ teacher_item.profile.user.phone }}
+                                </a>
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <hr class="my-3">
+
+                    <!-- Subjects Taught -->
+                    {% if teacher_item.subjects %}
+                    <div class="subjects-section mb-3">
+                        <h6 class="text-uppercase text-muted small font-weight-bold mb-2">Subjects</h6>
+                        <div class="subjects-list">
+                            {% for subject in teacher_item.subjects %}
+                            <span class="badge bg-info text-dark me-1 mb-1">
+                                {{ subject.name }} ({{ subject.code }})
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Qualifications -->
+                    {% if teacher_item.profile.qualification %}
+                    <div class="qualification-section">
+                        <h6 class="text-uppercase text-muted small font-weight-bold mb-2">Qualifications</h6>
+                        <p class="mb-0 small">
+                            <i class="fas fa-certificate text-warning"></i>
+                            {{ teacher_item.profile.qualification }}
+                        </p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Specialization -->
+                    {% if teacher_item.profile.specialization %}
+                    <div class="specialization-section mt-2">
+                        <p class="mb-0 small text-muted">
+                            <strong>Specialization:</strong> {{ teacher_item.profile.specialization }}
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="card-footer bg-light border-top">
+                    <div class="d-grid gap-2">
+                        <a href="mailto:{{ teacher_item.profile.user.email }}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-envelope me-1"></i> Send Email
+                        </a>
+                        {% if teacher_item.profile.user.phone %}
+                        <a href="tel:{{ teacher_item.profile.user.phone }}" class="btn btn-sm btn-success">
+                            <i class="fas fa-phone me-1"></i> Call Teacher
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% elif not query %}
+    <!-- Empty State -->
+    <div class="row">
+        <div class="col-lg-6 mx-auto">
+            <div class="text-center py-5">
+                <div class="mb-4" style="font-size: 4rem;">👨‍🏫</div>
+                <h3>Start Searching for Teachers</h3>
+                <p class="text-muted mb-4">
+                    Enter a teacher's name or subject to find their contact information. 
+                    You can then reach out directly via email or phone.
+                </p>
+                <div class="alert alert-info">
+                    <strong>{{ total_teachers }}</strong> teacher{{ total_teachers|pluralize }} available in the system
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- No Results State -->
+    <div class="row">
+        <div class="col-lg-6 mx-auto">
+            <div class="text-center py-5">
+                <div class="mb-4" style="font-size: 3rem;">😕</div>
+                <h3>No Teachers Found</h3>
+                <p class="text-muted mb-4">
+                    We couldn't find any teachers matching "<strong>{{ query }}</strong>". 
+                    Try searching with a different name, subject, or qualification.
+                </p>
+                <a href="{% url 'academics:student_teachers_search' %}" class="btn btn-primary">
+                    <i class="fas fa-redo me-1"></i> Clear Search
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .teacher-avatar-circle {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.5rem;
+    }
+
+    .teacher-card {
+        transition: all 0.3s ease;
+    }
+
+    .teacher-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .contact-item {
+        display: flex;
+        align-items: center;
+        font-size: 0.95rem;
+    }
+
+    .contact-item i {
+        min-width: 20px;
+    }
+
+    .subjects-list {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .search-header-section {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        padding: 2rem;
+        border-radius: 10px;
+        border-left: 4px solid #667eea;
+    }
+
+    @media (max-width: 768px) {
+        .search-header-section {
+            text-align: center;
+        }
+
+        .teacher-card .card-body {
+            font-size: 0.9rem;
+        }
+
+        .teacher-avatar-circle {
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
+        }
+    }
+</style>
+{% endblock %}
