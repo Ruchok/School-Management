@@ -61,7 +61,7 @@
                 <span class="nav-icon">📊</span><span>Dashboard</span>
             </a>
 
-            {% if user.role == "ADMIN" or user.role == "PRINCIPLE_ADMIN" or user.is_staff or user.is_superuser %}
+            {% if user.role == "ADMIN" or user.role == "PRINCIPLE_ADMIN" or user.role == "ACADEMIC_ADMIN" or user.is_staff or user.is_superuser %}
             {# ── ADMIN / PRINCIPLE ADMIN NAV ── #}
             <div class="nav-section-label">Academics</div>
             <a href="{% url 'academics:classes' %}" class="nav-link">

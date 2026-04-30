@@ -98,6 +98,7 @@
         .role-card:nth-child(2) { animation-delay: 0.2s; }
         .role-card:nth-child(3) { animation-delay: 0.3s; }
         .role-card:nth-child(4) { animation-delay: 0.4s; }
+        .role-card:nth-child(5) { animation-delay: 0.5s; }
         .role-card:hover {
             transform: translateY(-10px);
             box-shadow: 0 20px 50px rgba(0,0,0,0.15);
@@ -226,6 +227,14 @@
                 <h2>Admin</h2>
                 <p>School administration and system management</p>
                 <button class="btn">Sign In as Admin</button>
+            </a>
+
+            <!-- Academic Admin Portal -->
+            <a href="{% url 'school_admin:login' %}" class="role-card" style="background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(240,245,255,0.95));">
+                <span class="role-icon">🎓</span>
+                <h2>App Portal</h2>
+                <p>Manage student results, routines, and app notifications</p>
+                <button class="btn">Sign In to Portal</button>
             </a>
         </div>
 

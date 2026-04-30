@@ -14,7 +14,7 @@ from exams.models import Exam, ExamResult
 from .models import ClassRoutine
 from .forms import StudentForm, TeacherForm, FeePaymentForm, ClassRoutineForm
 
-_ADMIN_ROLES = {'ADMIN', 'PRINCIPLE_ADMIN'}
+_ADMIN_ROLES = {'ADMIN', 'PRINCIPLE_ADMIN', 'ACADEMIC_ADMIN'}
 
 
 class AdminAuthMixin:
@@ -67,7 +67,7 @@ class AdminLoginView(View):
         if not (is_admin_role or is_staff):
             messages.error(
                 request,
-                'This portal is for School Admin / Principle Admin only. '
+                'This portal is for School Admin / Principle Admin / Academic Admin only. '
                 f'Your account role is "{user.get_role_display()}".'
             )
             return render(request, self.template_name, {'username': username})
@@ -79,6 +79,11 @@ class AdminLoginView(View):
             request.session['principle_admin_authenticated'] = True
             request.session['principle_admin'] = True
             messages.success(request, f'Welcome, Principle Admin {user.get_full_name() or user.username}!')
+        elif user.role == 'ACADEMIC_ADMIN':
+            request.session['principle_admin_authenticated'] = False
+            request.session['principle_admin'] = False
+            request.session['academic_admin'] = True
+            messages.success(request, f'Welcome, Academic Admin {user.get_full_name() or user.username}!')
         else:
             request.session['principle_admin_authenticated'] = False
             request.session['principle_admin'] = False

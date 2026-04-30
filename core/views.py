@@ -16,7 +16,7 @@ from users.models import CustomUser
 
 def _role_home_url(user):
 	"""Return the appropriate home URL for an authenticated user's role."""
-	if user.role in ("ADMIN", "PRINCIPLE_ADMIN") or user.is_staff or user.is_superuser:
+	if user.role in ("ADMIN", "PRINCIPLE_ADMIN", "ACADEMIC_ADMIN") or user.is_staff or user.is_superuser:
 		return "/school-admin/dashboard/"
 	return "/dashboard/"
 
@@ -127,7 +127,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 	def dispatch(self, request, *args, **kwargs):
 		# School admins / superusers belong in the school-admin panel, not here
 		if request.user.is_authenticated and (
-			request.user.role in ("ADMIN", "PRINCIPLE_ADMIN")
+			request.user.role in ("ADMIN", "PRINCIPLE_ADMIN", "ACADEMIC_ADMIN")
 			or request.user.is_staff
 			or request.user.is_superuser
 		):

@@ -74,15 +74,6 @@
                                 {% endif %}
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">{{ form.roll_number.label }}</label>
-                                <input type="text" class="form-control{% if form.non_field_errors %} is-invalid{% endif %}" name="roll_number" value="{{ form.roll_number.value|default:'' }}">
-                                {% if form.roll_number.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.roll_number.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
                     </div>
 
                     <div class="row">

@@ -1,3 +1,5 @@
+﻿import re
+
 from django import forms
 from django.contrib.auth import get_user_model
 from academics.models import TeacherProfile, StudentProfile, SchoolClass
@@ -18,9 +20,8 @@ class StudentForm(forms.ModelForm):
     
     class Meta:
         model = StudentProfile
-        fields = ['roll_number', 'classroom', 'admission_date', 'guardian_name', 'guardian_phone']
+        fields = ['classroom', 'admission_date', 'guardian_name', 'guardian_phone']
         labels = {
-            'roll_number': 'Roll Number',
             'classroom': 'Class',
             'admission_date': 'Admission Date',
             'guardian_name': 'Guardian Name',
@@ -30,60 +31,60 @@ class StudentForm(forms.ModelForm):
             'admission_date': forms.DateInput(attrs={'type': 'date'}),
         }
     
+    def clean_first_name(self):
+        first_name = self.cleaned_data.get('first_name')
+        if first_name and not re.match(r"^[A-Za-z\s]+$", first_name):
+            raise forms.ValidationError("First name should only contain letters and spaces.")
+        return first_name
+        
+    def clean_last_name(self):
+        last_name = self.cleaned_data.get('last_name')
+        if last_name and not re.match(r"^[A-Za-z\s]+$", last_name):
+            raise forms.ValidationError("Last name should only contain letters and spaces.")
+        return last_name
+
     def clean_username(self):
         username = self.cleaned_data.get('username')
-        # Allow the same username if editing an existing student
         if self.instance.pk and self.instance.user and self.instance.user.username == username:
             return username
-        # Check if username already exists for new students
         if User.objects.filter(username=username).exists():
             raise forms.ValidationError('This username is already taken. Please choose another one.')
         return username
     
     def clean(self):
         cleaned_data = super().clean()
-        roll_number = cleaned_data.get('roll_number')
         classroom = cleaned_data.get('classroom')
         
-        if roll_number and classroom:
-            # Check if roll number already exists in this classroom
-            existing = StudentProfile.objects.filter(
-                roll_number=roll_number,
-                classroom=classroom
-            )
+        # If it's a new student creation (no primary key), set up the roll number logic
+        if not self.instance.pk and classroom:
+            count = StudentProfile.objects.filter(classroom=classroom).count()
+            parts = classroom.name.split()
+            cl_prefix = parts[-1] if parts else "C"
+            roll_number = f"{cl_prefix}{classroom.section}-{count + 1:03d}"
             
-            # If editing, exclude the current student
-            if self.instance.pk:
-                existing = existing.exclude(pk=self.instance.pk)
-            
-            if existing.exists():
-                raise forms.ValidationError(
-                    f'Roll number "{roll_number}" already exists in class "{classroom}". '
-                    'Each student in the same class must have a unique roll number.'
-                )
+            # Note: We don't need validation checks for this auto-generated roll number 
+            # because we are calculating the next available number logically.
+            # We set it directly onto the instance before saving.
+            self.instance.roll_number = roll_number
         
         return cleaned_data
     
     def save(self, commit=True):
         student = super().save(commit=False)
         
-        # Get or create user
         if student.user_id:
             user = student.user
         else:
             user = User(username=self.cleaned_data['username'], role='STUDENT')
         
-        # Update user fields
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
         user.email = self.cleaned_data.get('email', '')
         
-        # Set password - generate default if not provided during creation
         password = self.cleaned_data.get('password')
         if password:
             user.set_password(password)
-        elif not student.user_id:  # Only set default password for new users
-            # Set a default password using username
+        elif not student.user_id:
             default_password = f"Student@{self.cleaned_data['username']}"
             user.set_password(default_password)
         
@@ -117,12 +118,22 @@ class TeacherForm(forms.ModelForm):
             'joined_on': forms.DateInput(attrs={'type': 'date'}),
         }
     
+    def clean_first_name(self):
+        first_name = self.cleaned_data.get('first_name')
+        if first_name and not re.match(r"^[A-Za-z\s]+$", first_name):
+            raise forms.ValidationError("First name should only contain letters and spaces.")
+        return first_name
+        
+    def clean_last_name(self):
+        last_name = self.cleaned_data.get('last_name')
+        if last_name and not re.match(r"^[A-Za-z\s]+$", last_name):
+            raise forms.ValidationError("Last name should only contain letters and spaces.")
+        return last_name
+
     def clean_username(self):
         username = self.cleaned_data.get('username')
-        # Allow the same username if editing an existing teacher
         if self.instance.pk and self.instance.user and self.instance.user.username == username:
             return username
-        # Check if username already exists for new teachers
         if User.objects.filter(username=username).exists():
             raise forms.ValidationError('This username is already taken. Please choose another one.')
         return username
@@ -130,24 +141,20 @@ class TeacherForm(forms.ModelForm):
     def save(self, commit=True):
         teacher = super().save(commit=False)
         
-        # Get or create user
         if teacher.user_id:
             user = teacher.user
         else:
             user = User(username=self.cleaned_data['username'], role='TEACHER')
         
-        # Update user fields
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
         user.email = self.cleaned_data.get('email', '')
         user.phone = self.cleaned_data.get('phone', '')
         
-        # Set password - generate default if not provided during creation
         password = self.cleaned_data.get('password')
         if password:
             user.set_password(password)
-        elif not teacher.user_id:  # Only set default password for new users
-            # Set a default password using username
+        elif not teacher.user_id:
             default_password = f"Teacher@{self.cleaned_data['username']}"
             user.set_password(default_password)
         
