@@ -22,6 +22,7 @@ class AttendanceListView(NonStudentRequiredMixin, LoginRequiredMixin, View):
 
 	def get(self, request):
 		selected_classroom = request.GET.get("classroom")
+		selected_date = request.GET.get("date")
 		students = StudentProfile.objects.none()
 		if selected_classroom:
 			students = StudentProfile.objects.filter(classroom_id=selected_classroom).select_related("user")
@@ -31,7 +32,7 @@ class AttendanceListView(NonStudentRequiredMixin, LoginRequiredMixin, View):
 			self.template_name,
 			{
 				"attendance_days": records,
-				"form": AttendanceBulkForm(initial={"classroom": selected_classroom}),
+				"form": AttendanceBulkForm(initial={"classroom": selected_classroom, "date": selected_date}),
 				"students": students,
 			},
 		)
@@ -39,6 +40,7 @@ class AttendanceListView(NonStudentRequiredMixin, LoginRequiredMixin, View):
 	def post(self, request):
 		form = AttendanceBulkForm(request.POST)
 		if not form.is_valid():
+			print(f"Form errors: {form.errors}")
 			records = Attendance.objects.select_related("classroom", "taken_by")[:30]
 			return render(request, self.template_name, {"attendance_days": records, "form": form})
 
